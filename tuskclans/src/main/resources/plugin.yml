@@ -1,0 +1,29 @@
+name: TuskClans
+version: '${version}'
+main: io.github.tuskworks.clans.TuskClans
+api-version: '1.21'
+folia-supported: true
+description: Lightweight clans & teams for SMP servers — chat, friendly fire, alliances, clan homes.
+author: TuskWorks
+website: https://github.com/TuskWorks/plugins
+softdepend: [PlaceholderAPI, Vault]
+
+permissions:
+  tuskclans.use:
+    description: Use /clan and join, leave or chat in clans.
+    default: true
+  tuskclans.create:
+    description: Create a new clan.
+    default: true
+  tuskclans.home:
+    description: Teleport to the clan home.
+    default: true
+  tuskclans.admin:
+    description: Reload the plugin and manage any clan.
+    default: op
+  tuskclans.bypass.cost:
+    description: Create clans without paying the creation cost.
+    default: op
+  tuskclans.bypass.cooldown:
+    description: Skip clan home warmup and cooldown.
+    default: op

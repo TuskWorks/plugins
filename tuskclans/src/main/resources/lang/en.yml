@@ -1,0 +1,268 @@
+# TuskClans messages — MiniMessage format: https://docs.advntr.dev/minimessage/format
+# <prefix> inserts the prefix below. Set a message to '' to hide it.
+
+prefix: '<dark_gray>[<#b4c3d3>Clans</#b4c3d3>]</dark_gray> '
+
+role:
+  member: Member
+  officer: Officer
+  leader: Leader
+
+error:
+  no-permission: '<prefix><red>You don''t have permission to do that.'
+  players-only: '<prefix><red>Only players can use this command.'
+  unknown-command: '<prefix><red>Unknown subcommand <white><command></white>. Try <white>/clan help</white>.'
+  usage: '<prefix><red>Usage: <white><usage>'
+  not-in-clan: '<prefix><red>You are not in a clan.'
+  already-in-clan: '<prefix><red>You are already in a clan.'
+  tag-length: '<prefix><red>Clan tags must be <min>-<max> characters long.'
+  tag-invalid: '<prefix><red>That tag contains characters that are not allowed.'
+  name-length: '<prefix><red>Clan names must be 1-<max> characters long.'
+  tag-taken: '<prefix><red>The tag <white><tag></white> is already taken.'
+  clan-not-found: '<prefix><red>No clan with the tag <white><tag></white>.'
+  player-not-found: '<prefix><red>Player <white><player></white> is not online.'
+  player-not-in-your-clan: '<prefix><red><white><player></white> is not in your clan.'
+  role-too-low: '<prefix><red>Your clan rank is too low to do that.'
+  cannot-target-self: '<prefix><red>You can''t do that to yourself.'
+  target-already-in-clan: '<prefix><red><white><player></white> is already in a clan.'
+  already-invited: '<prefix><red><white><player></white> already has a pending invite.'
+  no-invite: '<prefix><red>You have no pending clan invites.'
+  multiple-invites: '<prefix><red>You have several invites (<white><tags></white>). Add the tag: <white>/clan accept <tag>'
+  clan-full: '<prefix><red>The clan is full (<max> members).'
+  leader-cannot-leave: '<prefix><red>Leaders can''t leave. Use <white>/clan transfer</white> or <white>/clan disband</white>.'
+  cannot-act-on-rank: '<prefix><red>You can''t do that to <white><player></white> — their rank is equal or higher.'
+  promote-invalid: '<prefix><red><white><player></white> can''t be promoted any further.'
+  demote-invalid: '<prefix><red><white><player></white> is not an officer.'
+  clan-not-open: '<prefix><red><white><tag></white> is invite-only.'
+  ally-self: '<prefix><red>You can''t ally with your own clan.'
+  already-allied: '<prefix><red>You are already allied with <white><tag></white>.'
+  not-allied: '<prefix><red>You are not allied with <white><tag></white>.'
+  ally-limit: '<prefix><red>Your clan already has the maximum of <max> allies.'
+  ally-limit-other: '<prefix><red><white><tag></white> already has the maximum of <max> allies.'
+  ally-request-pending: '<prefix><red>You already asked <white><tag></white> for an alliance.'
+  no-home: '<prefix><red>Your clan has no home. An officer can set one with <white>/clan sethome</white>.'
+  home-disabled: '<prefix><red>Clan homes are disabled on this server.'
+  home-cooldown: '<prefix><red>Wait <white><seconds>s</white> before using the clan home again.'
+  home-world-missing: '<prefix><red>The clan home''s world (<white><world></white>) is not loaded.'
+  world-disabled: '<prefix><red>Clan homes are disabled in this world.'
+  insufficient-funds: '<prefix><red>Creating a clan costs <white><cost></white>.'
+
+create:
+  success: '<prefix><green>Clan <white>[<tag>] <name></white> created! Invite players with <white>/clan invite <player></white>.'
+  charged: '<prefix><gray>Paid <white><cost></white> to create the clan.'
+
+disband:
+  confirm: '<prefix><yellow>This deletes <white><tag></white> for everyone. Type <click:run_command:''/clan disband confirm''><white><u>/clan disband confirm</u></white></click> to continue.'
+  success: '<prefix><green>Clan <white><tag></white> has been disbanded.'
+  notify: '<prefix><red>Your clan <white><tag></white> has been disbanded.'
+
+invite:
+  sent: '<prefix><green>Invited <white><player></white> to the clan.'
+  broadcast: '<prefix><gray><white><actor></white> invited <white><player></white> to the clan.'
+  received: '<prefix><yellow><white><player></white> invited you to <white>[<tag>] <name></white>. <click:run_command:''/clan accept''><hover:show_text:''Join the clan''><green>[Accept]</green></hover></click> <click:run_command:''/clan deny''><hover:show_text:''Decline''><red>[Deny]</red></hover></click> <gray>(expires in <seconds>s)'
+  denied: '<prefix><gray>You declined the invite from <white><tag></white>.'
+  reminder: '<prefix><yellow>You have pending clan invites: <white><tags></white>. Use <white>/clan accept <tag></white>.'
+
+join:
+  success: '<prefix><green>You joined <white>[<tag>] <name></white>!'
+  broadcast: '<prefix><green><white><player></white> joined the clan.'
+
+leave:
+  success: '<prefix><gray>You left <white><tag></white>.'
+  broadcast: '<prefix><gray><white><player></white> left the clan.'
+
+kick:
+  success: '<prefix><green>Kicked <white><player></white> from the clan.'
+  notify: '<prefix><red>You were kicked from <white><tag></white> by <white><actor></white>.'
+  broadcast: '<prefix><gray><white><actor></white> kicked <white><player></white> from the clan.'
+
+promote:
+  success: '<prefix><green><white><player></white> is now an officer.'
+  broadcast: '<prefix><gray><white><player></white> was promoted to officer.'
+
+demote:
+  success: '<prefix><green><white><player></white> is now a member.'
+  broadcast: '<prefix><gray><white><player></white> was demoted to member.'
+
+transfer:
+  confirm: '<prefix><yellow>This makes <white><player></white> the clan leader. Type <white>/clan transfer <player> confirm</white> to continue.'
+  success: '<prefix><green><white><player></white> is now the clan leader. You are an officer.'
+  broadcast: '<prefix><gold><white><player></white> is the new clan leader.'
+
+home:
+  set: '<prefix><green>Clan home set.'
+  set-broadcast: '<prefix><gray><white><player></white> moved the clan home.'
+  deleted: '<prefix><green>Clan home removed.'
+  warmup: '<prefix><gray>Teleporting to the clan home in <white><seconds>s</white>. Don''t move!'
+  cancelled: '<prefix><red>Teleport cancelled because you moved.'
+  teleported: '<prefix><green>Welcome to the clan home.'
+
+ff:
+  enabled: '<prefix><red>Friendly fire is now ON (set by <white><player></white>).'
+  disabled: '<prefix><green>Friendly fire is now OFF (set by <white><player></white>).'
+
+open:
+  enabled: '<prefix><green>Your clan is now open — anyone can <white>/clan join</white>.'
+  disabled: '<prefix><green>Your clan is now invite-only.'
+
+ally:
+  requested: '<prefix><green>Alliance request sent to <white><tag></white>.'
+  request-received: '<prefix><yellow><white><tag></white> wants to become allies. An officer can accept with <white>/clan ally <tag></white>.'
+  accepted: '<prefix><green>You are now allied with <white><tag></white>.'
+  formed: '<prefix><green>Your clan is now allied with <white><tag></white>.'
+  removed: '<prefix><gray>The alliance with <white><tag></white> has ended.'
+
+chat:
+  clan-format: '<dark_aqua>[Clan]</dark_aqua> <gray><player>:</gray> <white><message>'
+  ally-format: '<light_purple>[Ally]</light_purple> <gray>[<tag>] <player>:</gray> <white><message>'
+  mode-public: '<prefix><gray>You are now talking in <white>public</white> chat.'
+  mode-clan: '<prefix><gray>You are now talking in <dark_aqua>clan</dark_aqua> chat. Run it again to switch back.'
+  mode-ally: '<prefix><gray>You are now talking in <light_purple>ally</light_purple> chat. Run it again to switch back.'
+
+info:
+  - '<dark_gray>───── <white>[<tag>] <name></white> ─────'
+  - '<gray>Leader: <white><leader>'
+  - '<gray>Members (<white><online></white> online, <white><members></white>/<max>): <white><member_list>'
+  - '<gray>Allies: <white><allies>'
+  - '<gray>Kills: <white><kills></white>  Deaths: <white><deaths></white>  KDR: <white><kdr>'
+  - '<gray>Friendly fire: <white><ff></white>  Open: <white><open>'
+info-none: none
+info-on: 'on'
+info-off: 'off'
+
+list:
+  empty: '<prefix><gray>There are no clans yet. Start one with <white>/clan create</white>!'
+  header: '<dark_gray>───── <white>Clans</white> <gray>(page <page>/<pages>)</gray> ─────'
+  entry: '<gray><rank>. <white>[<tag>] <name></white> — <members> members'
+
+top:
+  header: '<dark_gray>───── <gold>Top clans</gold> <gray>(by kills)</gray> ─────'
+  entry: '<gray><rank>. <white>[<tag>] <name></white> — <gold><kills></gold> kills, <deaths> deaths (KDR <kdr>)'
+
+admin:
+  reloaded: '<prefix><green>TuskClans reloaded. Command alias changes need a restart.'
+  disbanded: '<prefix><green>Disbanded <white><tag></white>.'
+
+usage:
+  create: /clan create <tag> <name>
+  invite: /clan invite <player>
+  join: /clan join <tag>
+  kick: /clan kick <player>
+  promote: /clan promote <player>
+  demote: /clan demote <player>
+  transfer: /clan transfer <player>
+  ally: /clan ally <tag>
+  unally: /clan unally <tag>
+  info: /clan info <tag>
+  list: /clan list [page]
+  admin: /clan admin <reload|disband>
+  admin-disband: /clan admin disband <tag>
+
+help:
+  header: '<dark_gray>───── <white>TuskClans</white> ─────'
+  create: '<white>/clan create <tag> <name></white> <gray>— start a clan'
+  info: '<white>/clan info [tag]</white> <gray>— clan details'
+  list: '<white>/clan list [page]</white> <gray>— all clans'
+  top: '<white>/clan top</white> <gray>— leaderboard'
+  invite: '<white>/clan invite <player></white> <gray>— invite a player'
+  accept: '<white>/clan accept [tag]</white> <gray>— accept an invite'
+  deny: '<white>/clan deny [tag]</white> <gray>— decline an invite'
+  join: '<white>/clan join <tag></white> <gray>— join an open clan'
+  leave: '<white>/clan leave</white> <gray>— leave your clan'
+  kick: '<white>/clan kick <player></white> <gray>— remove a member'
+  promote: '<white>/clan promote <player></white> <gray>— make officer'
+  demote: '<white>/clan demote <player></white> <gray>— back to member'
+  transfer: '<white>/clan transfer <player></white> <gray>— hand over leadership'
+  disband: '<white>/clan disband</white> <gray>— delete the clan'
+  chat: '<white>/clan chat [message]</white> <gray>— clan chat (toggle without message)'
+  allychat: '<white>/clan allychat [message]</white> <gray>— ally chat'
+  home: '<white>/clan home</white> <gray>— teleport to the clan home'
+  sethome: '<white>/clan sethome</white> <gray>— set the clan home'
+  delhome: '<white>/clan delhome</white> <gray>— remove the clan home'
+  ff: '<white>/clan ff</white> <gray>— toggle friendly fire'
+  open: '<white>/clan open</white> <gray>— toggle invite-only'
+  ally: '<white>/clan ally <tag></white> <gray>— request or accept an alliance'
+  unally: '<white>/clan unally <tag></white> <gray>— end an alliance'
+  admin: '<white>/clan admin <reload|disband></white> <gray>— admin tools'
+  menu: '<white>/clan</white> or <white>/clan menu</white> <gray>— open the clan menu'
+
+gui:
+  title-clan: '<dark_gray>[<tag>] <name>'
+  title-none: '<dark_gray>Clans'
+  info:
+    name: '<white><b>[<tag>] <name>'
+    lore:
+      - '<gray>Leader: <white><leader>'
+      - '<gray>Members: <white><members>/<max></white> (<online> online)'
+      - '<gray>Allies: <white><allies>'
+      - '<gray>Kills <white><kills></white> · Deaths <white><deaths></white> · KDR <white><kdr>'
+      - '<gray>Friendly fire: <white><ff></white> · Open: <white><open>'
+  member:
+    name: '<white><player>'
+    lore-online:
+      - '<gray><role>'
+      - '<green>Online'
+    lore-offline:
+      - '<gray><role>'
+      - '<dark_gray>Offline'
+  more-members:
+    name: '<gray>…and <count> more'
+    lore:
+      - '<yellow>Click for the full list'
+  home:
+    name: '<aqua>Clan home'
+    lore:
+      - '<yellow>Click to teleport'
+  home-missing:
+    name: '<gray>Clan home'
+    lore:
+      - '<gray>Not set yet — an officer can use'
+      - '<white>/clan sethome'
+  chat:
+    name: '<dark_aqua>Clan chat'
+    lore:
+      - '<gray>Switch between clan and public chat'
+  allychat:
+    name: '<light_purple>Ally chat'
+    lore:
+      - '<gray>Switch between ally and public chat'
+  top:
+    name: '<gold>Top clans'
+    lore:
+      - '<gray>See the leaderboard'
+  help:
+    name: '<white>Commands'
+    lore:
+      - '<gray>List every /clan command'
+  ff:
+    name: '<red>Friendly fire: <white><ff>'
+    lore:
+      - '<yellow>Click to toggle'
+  open:
+    name: '<green>Open to join: <white><open>'
+    lore:
+      - '<yellow>Click to toggle'
+  leave:
+    name: '<red>Leave clan'
+    lore:
+      - '<gray>Leave <white><tag></white>'
+  disband:
+    name: '<red>Disband clan'
+    lore:
+      - '<gray>Asks for confirmation first'
+  no-clan:
+    name: '<white>You are not in a clan'
+    lore:
+      - '<gray>Start one with'
+      - '<white>/clan create <tag> <name>'
+      - '<gray>or join one below.'
+  invite:
+    name: '<green>[<tag>] <name>'
+    lore:
+      - '<gray>Invited you · <members> members'
+      - '<yellow>Click to join'
+  open-clan:
+    name: '<aqua>[<tag>] <name>'
+    lore:
+      - '<gray>Open clan · <members> members'
+      - '<yellow>Click to join'

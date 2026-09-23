@@ -1,0 +1,268 @@
+# TuskClans 訊息（繁體中文）— MiniMessage 格式：https://docs.advntr.dev/minimessage/format
+# <prefix> 會換成下面的前綴。把訊息設成 '' 就不會顯示。
+
+prefix: '<dark_gray>[<#b4c3d3>公會</#b4c3d3>]</dark_gray> '
+
+role:
+  member: 成員
+  officer: 幹部
+  leader: 會長
+
+error:
+  no-permission: '<prefix><red>你沒有權限這麼做。'
+  players-only: '<prefix><red>只有玩家可以使用這個指令。'
+  unknown-command: '<prefix><red>沒有 <white><command></white> 這個子指令，試試 <white>/clan help</white>。'
+  usage: '<prefix><red>用法：<white><usage>'
+  not-in-clan: '<prefix><red>你還沒有加入公會。'
+  already-in-clan: '<prefix><red>你已經在公會裡了。'
+  tag-length: '<prefix><red>公會標籤長度必須是 <min>-<max> 個字元。'
+  tag-invalid: '<prefix><red>公會標籤含有不允許的字元。'
+  name-length: '<prefix><red>公會名稱長度必須是 1-<max> 個字元。'
+  tag-taken: '<prefix><red>標籤 <white><tag></white> 已經被使用了。'
+  clan-not-found: '<prefix><red>找不到標籤為 <white><tag></white> 的公會。'
+  player-not-found: '<prefix><red>玩家 <white><player></white> 不在線上。'
+  player-not-in-your-clan: '<prefix><red><white><player></white> 不在你的公會裡。'
+  role-too-low: '<prefix><red>你在公會的階級不夠，不能這麼做。'
+  cannot-target-self: '<prefix><red>不能對自己這麼做。'
+  target-already-in-clan: '<prefix><red><white><player></white> 已經有公會了。'
+  already-invited: '<prefix><red><white><player></white> 已經有一個還沒回覆的邀請。'
+  no-invite: '<prefix><red>你目前沒有公會邀請。'
+  multiple-invites: '<prefix><red>你有好幾個邀請（<white><tags></white>），請指定標籤：<white>/clan accept <tag>'
+  clan-full: '<prefix><red>公會已經滿了（上限 <max> 人）。'
+  leader-cannot-leave: '<prefix><red>會長不能直接退出，請先用 <white>/clan transfer</white> 轉讓，或用 <white>/clan disband</white> 解散。'
+  cannot-act-on-rank: '<prefix><red>不能對 <white><player></white> 這麼做，對方階級跟你一樣或比你高。'
+  promote-invalid: '<prefix><red><white><player></white> 已經不能再升級了。'
+  demote-invalid: '<prefix><red><white><player></white> 不是幹部。'
+  clan-not-open: '<prefix><red><white><tag></white> 只接受邀請加入。'
+  ally-self: '<prefix><red>不能跟自己的公會結盟。'
+  already-allied: '<prefix><red>你們已經跟 <white><tag></white> 結盟了。'
+  not-allied: '<prefix><red>你們沒有跟 <white><tag></white> 結盟。'
+  ally-limit: '<prefix><red>你的公會盟友已達上限（<max> 個）。'
+  ally-limit-other: '<prefix><red><white><tag></white> 的盟友已達上限（<max> 個）。'
+  ally-request-pending: '<prefix><red>你已經向 <white><tag></white> 提出結盟請求了。'
+  no-home: '<prefix><red>公會還沒有據點，幹部可以用 <white>/clan sethome</white> 設定。'
+  home-disabled: '<prefix><red>這個伺服器沒有開放公會據點。'
+  home-cooldown: '<prefix><red>請等 <white><seconds> 秒</white>後再傳送到公會據點。'
+  home-world-missing: '<prefix><red>公會據點所在的世界（<white><world></white>）目前沒有載入。'
+  world-disabled: '<prefix><red>這個世界不能使用公會據點。'
+  insufficient-funds: '<prefix><red>建立公會需要 <white><cost></white>。'
+
+create:
+  success: '<prefix><green>公會 <white>[<tag>] <name></white> 建立成功！用 <white>/clan invite <player></white> 邀請玩家加入。'
+  charged: '<prefix><gray>已支付 <white><cost></white> 建立公會。'
+
+disband:
+  confirm: '<prefix><yellow>這會為所有成員刪除 <white><tag></white>。輸入 <click:run_command:''/clan disband confirm''><white><u>/clan disband confirm</u></white></click> 確認。'
+  success: '<prefix><green>公會 <white><tag></white> 已解散。'
+  notify: '<prefix><red>你的公會 <white><tag></white> 已經解散了。'
+
+invite:
+  sent: '<prefix><green>已邀請 <white><player></white> 加入公會。'
+  broadcast: '<prefix><gray><white><actor></white> 邀請了 <white><player></white> 加入公會。'
+  received: '<prefix><yellow><white><player></white> 邀請你加入 <white>[<tag>] <name></white>。<click:run_command:''/clan accept''><hover:show_text:''加入公會''><green>[接受]</green></hover></click> <click:run_command:''/clan deny''><hover:show_text:''拒絕''><red>[拒絕]</red></hover></click> <gray>（<seconds> 秒後失效）'
+  denied: '<prefix><gray>你拒絕了 <white><tag></white> 的邀請。'
+  reminder: '<prefix><yellow>你有尚未回覆的公會邀請：<white><tags></white>。用 <white>/clan accept <tag></white> 接受。'
+
+join:
+  success: '<prefix><green>你加入了 <white>[<tag>] <name></white>！'
+  broadcast: '<prefix><green><white><player></white> 加入了公會。'
+
+leave:
+  success: '<prefix><gray>你離開了 <white><tag></white>。'
+  broadcast: '<prefix><gray><white><player></white> 離開了公會。'
+
+kick:
+  success: '<prefix><green>已將 <white><player></white> 踢出公會。'
+  notify: '<prefix><red>你被 <white><actor></white> 踢出了 <white><tag></white>。'
+  broadcast: '<prefix><gray><white><actor></white> 把 <white><player></white> 踢出了公會。'
+
+promote:
+  success: '<prefix><green><white><player></white> 升為幹部了。'
+  broadcast: '<prefix><gray><white><player></white> 升為幹部。'
+
+demote:
+  success: '<prefix><green><white><player></white> 降回成員了。'
+  broadcast: '<prefix><gray><white><player></white> 被降回成員。'
+
+transfer:
+  confirm: '<prefix><yellow>這會讓 <white><player></white> 成為會長。輸入 <white>/clan transfer <player> confirm</white> 確認。'
+  success: '<prefix><green><white><player></white> 現在是會長了，你改為幹部。'
+  broadcast: '<prefix><gold><white><player></white> 成為新的會長。'
+
+home:
+  set: '<prefix><green>已設定公會據點。'
+  set-broadcast: '<prefix><gray><white><player></white> 移動了公會據點。'
+  deleted: '<prefix><green>已移除公會據點。'
+  warmup: '<prefix><gray><white><seconds> 秒</white>後傳送到公會據點，請不要移動！'
+  cancelled: '<prefix><red>你移動了，傳送已取消。'
+  teleported: '<prefix><green>歡迎回到公會據點。'
+
+ff:
+  enabled: '<prefix><red>友軍傷害已開啟（由 <white><player></white> 設定）。'
+  disabled: '<prefix><green>友軍傷害已關閉（由 <white><player></white> 設定）。'
+
+open:
+  enabled: '<prefix><green>公會已開放，任何人都可以用 <white>/clan join</white> 加入。'
+  disabled: '<prefix><green>公會改為只接受邀請。'
+
+ally:
+  requested: '<prefix><green>已向 <white><tag></white> 送出結盟請求。'
+  request-received: '<prefix><yellow><white><tag></white> 想跟你們結盟，幹部可以用 <white>/clan ally <tag></white> 接受。'
+  accepted: '<prefix><green>你們已經跟 <white><tag></white> 結盟了。'
+  formed: '<prefix><green>公會已經跟 <white><tag></white> 結盟。'
+  removed: '<prefix><gray>跟 <white><tag></white> 的同盟已經結束。'
+
+chat:
+  clan-format: '<dark_aqua>[公會]</dark_aqua> <gray><player>：</gray><white><message>'
+  ally-format: '<light_purple>[同盟]</light_purple> <gray>[<tag>] <player>：</gray><white><message>'
+  mode-public: '<prefix><gray>已切換到<white>公開</white>頻道。'
+  mode-clan: '<prefix><gray>已切換到<dark_aqua>公會</dark_aqua>頻道，再輸入一次可切回公開頻道。'
+  mode-ally: '<prefix><gray>已切換到<light_purple>同盟</light_purple>頻道，再輸入一次可切回公開頻道。'
+
+info:
+  - '<dark_gray>───── <white>[<tag>] <name></white> ─────'
+  - '<gray>會長：<white><leader>'
+  - '<gray>成員（<white><online></white> 人在線，<white><members></white>/<max>）：<white><member_list>'
+  - '<gray>盟友：<white><allies>'
+  - '<gray>擊殺：<white><kills></white>　死亡：<white><deaths></white>　KDR：<white><kdr>'
+  - '<gray>友軍傷害：<white><ff></white>　開放加入：<white><open>'
+info-none: 無
+info-on: 開
+info-off: 關
+
+list:
+  empty: '<prefix><gray>目前還沒有公會，用 <white>/clan create</white> 建立第一個吧！'
+  header: '<dark_gray>───── <white>公會列表</white> <gray>（第 <page>/<pages> 頁）</gray> ─────'
+  entry: '<gray><rank>. <white>[<tag>] <name></white> — <members> 位成員'
+
+top:
+  header: '<dark_gray>───── <gold>公會排行</gold> <gray>（依擊殺數）</gray> ─────'
+  entry: '<gray><rank>. <white>[<tag>] <name></white> — <gold><kills></gold> 擊殺、<deaths> 死亡（KDR <kdr>）'
+
+admin:
+  reloaded: '<prefix><green>TuskClans 已重新載入。指令別名的變更要重開伺服器才會生效。'
+  disbanded: '<prefix><green>已解散 <white><tag></white>。'
+
+usage:
+  create: /clan create <標籤> <名稱>
+  invite: /clan invite <玩家>
+  join: /clan join <標籤>
+  kick: /clan kick <玩家>
+  promote: /clan promote <玩家>
+  demote: /clan demote <玩家>
+  transfer: /clan transfer <玩家>
+  ally: /clan ally <標籤>
+  unally: /clan unally <標籤>
+  info: /clan info <標籤>
+  list: /clan list [頁數]
+  admin: /clan admin <reload|disband>
+  admin-disband: /clan admin disband <標籤>
+
+help:
+  header: '<dark_gray>───── <white>TuskClans</white> ─────'
+  create: '<white>/clan create <標籤> <名稱></white> <gray>— 建立公會'
+  info: '<white>/clan info [標籤]</white> <gray>— 公會資訊'
+  list: '<white>/clan list [頁數]</white> <gray>— 所有公會'
+  top: '<white>/clan top</white> <gray>— 排行榜'
+  invite: '<white>/clan invite <玩家></white> <gray>— 邀請玩家'
+  accept: '<white>/clan accept [標籤]</white> <gray>— 接受邀請'
+  deny: '<white>/clan deny [標籤]</white> <gray>— 拒絕邀請'
+  join: '<white>/clan join <標籤></white> <gray>— 加入開放的公會'
+  leave: '<white>/clan leave</white> <gray>— 離開公會'
+  kick: '<white>/clan kick <玩家></white> <gray>— 踢出成員'
+  promote: '<white>/clan promote <玩家></white> <gray>— 升為幹部'
+  demote: '<white>/clan demote <玩家></white> <gray>— 降回成員'
+  transfer: '<white>/clan transfer <玩家></white> <gray>— 轉讓會長'
+  disband: '<white>/clan disband</white> <gray>— 解散公會'
+  chat: '<white>/clan chat [訊息]</white> <gray>— 公會頻道（不帶訊息就是切換頻道）'
+  allychat: '<white>/clan allychat [訊息]</white> <gray>— 同盟頻道'
+  home: '<white>/clan home</white> <gray>— 傳送到公會據點'
+  sethome: '<white>/clan sethome</white> <gray>— 設定公會據點'
+  delhome: '<white>/clan delhome</white> <gray>— 移除公會據點'
+  ff: '<white>/clan ff</white> <gray>— 切換友軍傷害'
+  open: '<white>/clan open</white> <gray>— 切換是否開放加入'
+  ally: '<white>/clan ally <標籤></white> <gray>— 提出或接受結盟'
+  unally: '<white>/clan unally <標籤></white> <gray>— 解除同盟'
+  admin: '<white>/clan admin <reload|disband></white> <gray>— 管理工具'
+  menu: '<white>/clan</white> 或 <white>/clan menu</white> <gray>— 打開公會選單'
+
+gui:
+  title-clan: '<dark_gray>[<tag>] <name>'
+  title-none: '<dark_gray>公會'
+  info:
+    name: '<white><b>[<tag>] <name>'
+    lore:
+      - '<gray>會長：<white><leader>'
+      - '<gray>成員：<white><members>/<max></white>（<online> 人在線）'
+      - '<gray>盟友：<white><allies>'
+      - '<gray>擊殺 <white><kills></white> · 死亡 <white><deaths></white> · KDR <white><kdr>'
+      - '<gray>友軍傷害：<white><ff></white> · 開放加入：<white><open>'
+  member:
+    name: '<white><player>'
+    lore-online:
+      - '<gray><role>'
+      - '<green>在線'
+    lore-offline:
+      - '<gray><role>'
+      - '<dark_gray>離線'
+  more-members:
+    name: '<gray>…還有 <count> 人'
+    lore:
+      - '<yellow>點擊查看完整名單'
+  home:
+    name: '<aqua>公會據點'
+    lore:
+      - '<yellow>點擊傳送'
+  home-missing:
+    name: '<gray>公會據點'
+    lore:
+      - '<gray>還沒設定，幹部可以用'
+      - '<white>/clan sethome'
+  chat:
+    name: '<dark_aqua>公會頻道'
+    lore:
+      - '<gray>在公會頻道和公開頻道之間切換'
+  allychat:
+    name: '<light_purple>同盟頻道'
+    lore:
+      - '<gray>在同盟頻道和公開頻道之間切換'
+  top:
+    name: '<gold>公會排行'
+    lore:
+      - '<gray>查看排行榜'
+  help:
+    name: '<white>指令列表'
+    lore:
+      - '<gray>列出所有 /clan 指令'
+  ff:
+    name: '<red>友軍傷害：<white><ff>'
+    lore:
+      - '<yellow>點擊切換'
+  open:
+    name: '<green>開放加入：<white><open>'
+    lore:
+      - '<yellow>點擊切換'
+  leave:
+    name: '<red>離開公會'
+    lore:
+      - '<gray>離開 <white><tag></white>'
+  disband:
+    name: '<red>解散公會'
+    lore:
+      - '<gray>會先要求確認'
+  no-clan:
+    name: '<white>你還沒有加入公會'
+    lore:
+      - '<gray>用這個指令建立：'
+      - '<white>/clan create <標籤> <名稱>'
+      - '<gray>或從下面挑一個加入。'
+  invite:
+    name: '<green>[<tag>] <name>'
+    lore:
+      - '<gray>邀請了你 · <members> 位成員'
+      - '<yellow>點擊加入'
+  open-clan:
+    name: '<aqua>[<tag>] <name>'
+    lore:
+      - '<gray>開放加入 · <members> 位成員'
+      - '<yellow>點擊加入'
