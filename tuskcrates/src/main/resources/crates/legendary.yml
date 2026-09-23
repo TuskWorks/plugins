@@ -1,0 +1,70 @@
+# ─────────────────────────────────────────────
+#  Legendary crate: end-game loot, revealed with the in-world display animation
+# ─────────────────────────────────────────────
+
+display-name: "<gradient:#ffd452:#ff6a00><b>Legendary</b></gradient>"
+animation: display
+show-in-menu: true
+
+key:
+  material: TRIPWIRE_HOOK
+  name: "<crate> <white>Key"
+  lore:
+    - "<gray>Right-click a <crate> <gray>crate"
+    - "<gray>to open it."
+  glow: true
+
+hologram:
+  - "<crate> <white>Crate"
+  - "<gray>Right-click with a key"
+  - "<dark_gray>Left-click to preview"
+
+rewards:
+  netherite:
+    weight: 30
+    item:
+      material: NETHERITE_INGOT
+      amount: 2
+  beacon:
+    weight: 20
+    item:
+      material: BEACON
+    broadcast: true
+  god-sword:
+    weight: 20
+    item:
+      material: NETHERITE_SWORD
+      name: "<gradient:#ffd452:#ff6a00>Sunforged Blade"
+      lore:
+        - "<gray>Forged in the heart of a legendary crate."
+      enchantments:
+        sharpness: 5
+        unbreaking: 3
+        mending: 1
+        looting: 3
+    broadcast: true
+  elytra:
+    weight: 15
+    item:
+      material: ELYTRA
+    broadcast: true
+  enchanted-apples:
+    weight: 14
+    item:
+      material: ENCHANTED_GOLDEN_APPLE
+      amount: 2
+    broadcast: true
+  # Example of a command reward: works with any economy plugin.
+  # money:
+  #   weight: 10
+  #   item:
+  #     material: GOLD_BLOCK
+  #     name: "<gold>$10,000"
+  #   give-item: false
+  #   commands:
+  #     - "eco give <player> 10000"
+  dragon-egg:
+    weight: 1
+    item:
+      material: DRAGON_EGG
+    broadcast: true

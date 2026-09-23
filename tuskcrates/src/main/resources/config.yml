@@ -1,0 +1,41 @@
+# ─────────────────────────────────────────────
+#  TuskCrates — main configuration
+#  Crates live in plugins/TuskCrates/crates/<id>.yml
+#  All text uses MiniMessage: https://docs.advntr.dev/minimessage/format
+# ─────────────────────────────────────────────
+
+keys:
+  # Key type /tc give uses when none is specified: virtual | physical
+  default-type: virtual
+  # Let players spend virtual keys by right-clicking a crate block
+  # when they are not holding a physical key.
+  use-virtual-at-block: true
+
+crate-block:
+  # Push players back when they right-click a crate without a key.
+  knockback-without-key: true
+  knockback-strength: 0.8
+
+open:
+  # Refuse to open a crate when the player's inventory is full.
+  # When false, rewards that do not fit are dropped at the player's feet.
+  require-empty-slot: true
+
+hologram:
+  enabled: true
+  # Height above the crate block, in blocks.
+  height: 1.35
+
+animation:
+  roulette:
+    # Number of spins before the roulette stops. More = longer animation.
+    steps: 32
+    # Closing the menu early skips the animation; the reward is still granted.
+  display:
+    steps: 20
+    # How long the winning item stays on display, in ticks.
+    reveal-ticks: 50
+
+storage:
+  # How often virtual keys are saved to disk, in minutes.
+  autosave-minutes: 5

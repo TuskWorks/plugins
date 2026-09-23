@@ -1,0 +1,64 @@
+# ─────────────────────────────────────────────
+#  Common crate: everyday SMP loot
+#  The file name (common) is the crate id used in commands.
+# ─────────────────────────────────────────────
+
+display-name: "<gradient:#a8e063:#56ab2f><b>Common</b></gradient>"
+
+# instant | roulette | display
+animation: roulette
+
+# Show this crate in the /crates menu.
+show-in-menu: true
+
+# Physical key item. <crate> is replaced with display-name.
+key:
+  material: TRIPWIRE_HOOK
+  name: "<crate> <white>Key"
+  lore:
+    - "<gray>Right-click a <crate> <gray>crate"
+    - "<gray>to open it."
+  glow: true
+
+# Text above the crate block. Leave empty to hide it.
+hologram:
+  - "<crate> <white>Crate"
+  - "<gray>Right-click with a key"
+  - "<dark_gray>Left-click to preview"
+
+# weight: relative chance. The preview menu shows the percentages.
+# item: shown in the preview and given to the player (set give-item: false to only show it).
+# commands: run from console; <player> is replaced with the player's name.
+# broadcast: announce the win to the whole server.
+rewards:
+  iron:
+    weight: 30
+    item:
+      material: IRON_INGOT
+      amount: 16
+  gold:
+    weight: 25
+    item:
+      material: GOLD_INGOT
+      amount: 12
+  steak:
+    weight: 20
+    item:
+      material: COOKED_BEEF
+      amount: 32
+  xp:
+    weight: 15
+    item:
+      material: EXPERIENCE_BOTTLE
+      amount: 16
+  diamonds:
+    weight: 9
+    item:
+      material: DIAMOND
+      amount: 3
+  golden-apples:
+    weight: 1
+    item:
+      material: GOLDEN_APPLE
+      amount: 4
+    broadcast: true
