@@ -53,4 +53,6 @@ tasks.test {
 
 tasks.jar {
     archiveBaseName = "TuskClans"
+    // No NMS here, so tell Paper there is nothing to remap (faster first start on 1.21.x).
+    manifest.attributes("paperweight-mappings-namespace" to "mojang")
 }
