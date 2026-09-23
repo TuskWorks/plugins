@@ -43,4 +43,4 @@ Open orders per player default to 5; grant `tuskorders.limit.<number>` or `tusko
 
 End-to-end: `e2e/scenarios/tuskorders.js` drives two real clients against a headless server, with `e2e/fixtures/test-economy` standing in for Vault.
 
-Developed with AI assistance (Claude), reviewed and tested by TuskWorks.
+Developed with AI assistance (Claude).
