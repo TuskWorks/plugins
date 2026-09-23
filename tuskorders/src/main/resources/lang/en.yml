@@ -1,0 +1,194 @@
+# TuskOrders messages (MiniMessage format: https://docs.advntr.dev/minimessage/format)
+# <item> always shows the item's name in each player's own game language.
+
+prefix: "<gradient:#8ee08e:#3fa34d><bold>ORDERS</bold></gradient> <dark_gray>»</dark_gray> "
+
+error:
+  unknown-command: "<prefix><red>Unknown subcommand <white><command></white>. Try <white>/orders help</white>."
+  no-permission: "<prefix><red>You don't have permission to do that."
+  players-only: "<prefix><red>Only players can do that."
+  no-economy: "<prefix><red>Orders are unavailable: no economy plugin is installed."
+  unknown-item: "<prefix><red>'<white><input></white>' isn't an item. Try names like <white>diamond</white> or <white>oak_log</white>, or <white>hand</white> for what you're holding."
+  blocked-item: "<prefix><red>Orders for <white><item></white> aren't allowed on this server."
+  invalid-amount: "<prefix><red>'<white><input></white>' isn't a valid amount. Use a whole number like <white>64</white> or <white>2k</white>."
+  invalid-price: "<prefix><red>'<white><input></white>' isn't a valid price. Use something like <white>25</white>, <white>2.50</white> or <white>1.5k</white>."
+
+help:
+  player:
+    - "<gradient:#8ee08e:#3fa34d><bold>ORDERS</bold></gradient> <gray>— buy what you need, sell what others want"
+    - "<white>/orders</white> <dark_gray>-</dark_gray> <gray>browse open orders and deliver items"
+    - "<white>/orders create [item amount price]</white> <dark_gray>-</dark_gray> <gray>place a buy order"
+    - "<white>/orders mine</white> <dark_gray>-</dark_gray> <gray>collect items or cancel your orders"
+    - "<white>/orders search [item]</white> <dark_gray>-</dark_gray> <gray>find orders for an item"
+  admin:
+    - "<gradient:#8ee08e:#3fa34d><bold>ORDERS</bold></gradient> <gray>— buy what you need, sell what others want"
+    - "<white>/orders</white> <dark_gray>-</dark_gray> <gray>browse open orders and deliver items"
+    - "<white>/orders create [item amount price]</white> <dark_gray>-</dark_gray> <gray>place a buy order"
+    - "<white>/orders mine</white> <dark_gray>-</dark_gray> <gray>collect items or cancel your orders"
+    - "<white>/orders search [item]</white> <dark_gray>-</dark_gray> <gray>find orders for an item"
+    - "<white>/orders cancel [id]</white> <dark_gray>-</dark_gray> <gray>cancel any order and refund its owner"
+    - "<white>/orders reload</white> <dark_gray>-</dark_gray> <gray>reload config and messages"
+
+reload:
+  success: "<prefix><green>Reloaded config and messages."
+
+prompt:
+  hint: "<dark_gray>(type <gray>cancel</gray> to stop)"
+  cancelled: "<prefix><gray>Cancelled."
+
+search:
+  prompt: "<prefix><gray>Type the item to search for in chat."
+
+create:
+  usage: "<prefix><gray>Usage: <white>/orders create [item] [amount] [price each]</white>, or just <white>/orders create</white>."
+  prompt-item: "<prefix><gray>Which item do you want to buy? Type its name in chat, or <white>hand</white> for the item you're holding."
+  prompt-amount: "<prefix><gray>How many <white><item></white> do you want? <dark_gray>(max <max>)"
+  prompt-price: "<prefix><gray>How much will you pay for each <white><item></white>?"
+  success: "<prefix><green>Order #<id> placed: <white><amount>x <item></white> at <white><price></white> each. <white><total></white> is held until it's filled."
+  invalid-amount: "<prefix><red>Amount must be between 1 and <max>."
+  price-too-low: "<prefix><red>The minimum price is <white><min></white> per item."
+  price-too-high: "<prefix><red>The maximum price is <white><max></white> per item."
+  too-expensive: "<prefix><red>That order is too large."
+  limit-reached: "<prefix><red>You already have <white><limit></white> open orders. Cancel or finish one first."
+  no-money: "<prefix><red>You need <white><cost></white> to place this order."
+
+deliver:
+  success: "<prefix><green>Delivered <white><accepted>x <item></white> to <white><owner></white> and earned <white><payout></white>."
+  nothing: "<prefix><gray>You didn't deliver any matching items."
+  unavailable: "<prefix><red>That order is no longer open."
+  own-order: "<prefix><red>You can't deliver to your own order."
+  payment-failed: "<prefix><red>The payment failed, so your items were returned."
+  rejected: "<prefix><yellow><count> item(s) didn't match the order and were returned. Only plain items count: nothing renamed, enchanted or damaged."
+
+cancel:
+  usage: "<prefix><gray>Usage: <white>/orders cancel [id]"
+  success: "<prefix><green>Order #<id> cancelled and <white><refund></white> refunded."
+  not-found: "<prefix><red>There is no order #<id>."
+  not-owner: "<prefix><red>That isn't your order."
+  not-active: "<prefix><red>That order is already closed."
+  refund-failed: "<prefix><red>The refund failed, so the order stays open. Please tell an admin."
+
+collect:
+  success: "<prefix><green>Collected <white><count>x <item></white>."
+  inventory-full: "<prefix><yellow>Your inventory is full. The rest stays in the order."
+
+notify:
+  delivered: "<prefix><white><player></white> <gray>delivered <white><accepted>x <item></white> to your order #<id>."
+  completed: "<prefix><green>Your order for <white><amount>x <item></white> is complete! <click:run_command:/orders mine><hover:show_text:'Open your orders'><u>Collect it</u></hover></click>"
+  expired: "<prefix><yellow>Your order #<id> for <white><item></white> expired. <white><refund></white> was refunded."
+  waiting: "<prefix><gray>You have <white><count></white> item(s) waiting in your orders. <click:run_command:/orders mine><hover:show_text:'Open your orders'><green><u>Collect</u></green></hover></click>"
+
+gui:
+  previous-page: "<gray>« Previous page <dark_gray>(<page>/<pages>)"
+  next-page: "<gray>Next page » <dark_gray>(<page>/<pages>)"
+  sort:
+    price: "Highest price"
+    recent: "Most recent"
+    payout: "Biggest payout"
+  status:
+    active: "<green>Open"
+    completed: "<aqua>Completed"
+    cancelled: "<red>Cancelled"
+    expired: "<yellow>Expired"
+  confirm:
+    accept: "<green><bold>Confirm"
+    deny: "<red><bold>Cancel"
+
+  browse:
+    title: "Orders"
+    empty: "<gray>No open orders yet"
+    no-results: "<gray>No orders for '<white><filter></white>'"
+    order:
+      lore:
+        - "<gray>Buyer: <white><owner>"
+        - "<gray>Pays: <green><price></green> each"
+        - ""
+        - "<bar> <white><delivered></white><gray>/<amount>"
+        - "<gray>Up for grabs: <green><payout>"
+        - "<gray>Expires in: <white><expires>"
+        - ""
+      deliver:
+        - "<yellow>Click to deliver"
+      own:
+        - "<gray>This is your order"
+    sort:
+      name: "<white>Sort"
+      selected: ["<green>▶ <sort>"]
+      option: ["<gray>  <sort>"]
+      hint: ["", "<yellow>Click to change"]
+    search:
+      name: "<white>Search"
+      lore:
+        - "<gray>Find orders for an item"
+        - ""
+        - "<yellow>Click to search"
+      lore-active:
+        - "<gray>Showing: <white><filter>"
+        - ""
+        - "<yellow>Click to search again"
+        - "<yellow>Right-click to clear"
+    mine:
+      name: "<white>Your orders"
+      lore:
+        - "<gray>Open orders: <white><active>"
+        - "<gray>Items to collect: <white><uncollected>"
+        - ""
+        - "<yellow>Click to view"
+    create:
+      name: "<green>Create order"
+      lore:
+        - "<gray>Post an order and let other"
+        - "<gray>players bring you the items."
+        - ""
+        - "<yellow>Click to start"
+
+  deliver:
+    title: "Deliver <item> (<remaining> left, <price> each)"
+
+  mine:
+    title: "Your orders"
+    empty: "<gray>You have no orders"
+    back: "<white>Back to all orders"
+    collect-all: "<green>Collect everything"
+    order:
+      lore:
+        - "<gray>Order #<id> · <status>"
+        - "<gray>Price: <green><price></green> each"
+        - ""
+        - "<bar> <white><delivered></white><gray>/<amount>"
+        - "<gray>Waiting for you: <white><uncollected>"
+        - "<gray>Held in escrow: <green><escrow>"
+        - "<gray>Expires in: <white><expires>"
+        - ""
+      collect:
+        - "<yellow>Click to collect items"
+      cancel:
+        - "<red>Shift + right-click to cancel"
+
+  cancel:
+    title: "Cancel this order?"
+    summary:
+      name: "<white>Cancel order #<id>"
+      lore:
+        - "<gray>You get back: <green><refund>"
+        - "<gray>Delivered items stay collectable."
+
+  create:
+    title: "Place this order?"
+    summary:
+      name: "<white><amount>x <item>"
+      lore:
+        - "<gray>Price: <green><price></green> each"
+        - "<gray>You pay now: <green><total>"
+        - "<gray>Expires after: <white><expires>"
+        - ""
+        - "<gray>Unfilled parts are refunded"
+        - "<gray>if you cancel or it expires."
+      lore-fee:
+        - "<gray>Price: <green><price></green> each"
+        - "<gray>You pay now: <green><total>"
+        - "<gray>Includes fee: <red><fee></red> <dark_gray>(not refunded)"
+        - "<gray>Expires after: <white><expires>"
+        - ""
+        - "<gray>Unfilled parts are refunded"
+        - "<gray>if you cancel or it expires."

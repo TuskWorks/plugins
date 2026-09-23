@@ -1,0 +1,194 @@
+# TuskOrders 訊息（MiniMessage 格式：https://docs.advntr.dev/minimessage/format）
+# <item> 會以每位玩家自己的遊戲語言顯示物品名稱。
+
+prefix: "<gradient:#8ee08e:#3fa34d><bold>收購</bold></gradient> <dark_gray>»</dark_gray> "
+
+error:
+  unknown-command: "<prefix><red>未知的子指令 <white><command></white>，請輸入 <white>/orders help</white>。"
+  no-permission: "<prefix><red>你沒有權限這麼做。"
+  players-only: "<prefix><red>只有玩家可以使用。"
+  no-economy: "<prefix><red>收購系統目前無法使用：伺服器沒有安裝經濟插件。"
+  unknown-item: "<prefix><red>找不到物品「<white><input></white>」。請輸入像 <white>diamond</white>、<white>oak_log</white> 的英文 ID，或輸入 <white>hand</white> 使用手上的物品。"
+  blocked-item: "<prefix><red>本伺服器不允許收購 <white><item></white>。"
+  invalid-amount: "<prefix><red>「<white><input></white>」不是有效的數量，請輸入整數，例如 <white>64</white> 或 <white>2k</white>。"
+  invalid-price: "<prefix><red>「<white><input></white>」不是有效的價格，例如 <white>25</white>、<white>2.50</white> 或 <white>1.5k</white>。"
+
+help:
+  player:
+    - "<gradient:#8ee08e:#3fa34d><bold>收購</bold></gradient> <gray>— 想要什麼就掛單，別人送來立刻成交"
+    - "<white>/orders</white> <dark_gray>-</dark_gray> <gray>瀏覽收購單並交貨"
+    - "<white>/orders create [物品 數量 單價]</white> <dark_gray>-</dark_gray> <gray>建立收購單"
+    - "<white>/orders mine</white> <dark_gray>-</dark_gray> <gray>領取物品或取消自己的收購單"
+    - "<white>/orders search [物品]</white> <dark_gray>-</dark_gray> <gray>搜尋某個物品的收購單"
+  admin:
+    - "<gradient:#8ee08e:#3fa34d><bold>收購</bold></gradient> <gray>— 想要什麼就掛單，別人送來立刻成交"
+    - "<white>/orders</white> <dark_gray>-</dark_gray> <gray>瀏覽收購單並交貨"
+    - "<white>/orders create [物品 數量 單價]</white> <dark_gray>-</dark_gray> <gray>建立收購單"
+    - "<white>/orders mine</white> <dark_gray>-</dark_gray> <gray>領取物品或取消自己的收購單"
+    - "<white>/orders search [物品]</white> <dark_gray>-</dark_gray> <gray>搜尋某個物品的收購單"
+    - "<white>/orders cancel [編號]</white> <dark_gray>-</dark_gray> <gray>取消任何收購單並退款給掛單者"
+    - "<white>/orders reload</white> <dark_gray>-</dark_gray> <gray>重新載入設定與訊息"
+
+reload:
+  success: "<prefix><green>已重新載入設定與訊息。"
+
+prompt:
+  hint: "<dark_gray>（輸入 <gray>cancel</gray> 取消）"
+  cancelled: "<prefix><gray>已取消。"
+
+search:
+  prompt: "<prefix><gray>請在聊天欄輸入要搜尋的物品。"
+
+create:
+  usage: "<prefix><gray>用法：<white>/orders create [物品] [數量] [單價]</white>，或直接輸入 <white>/orders create</white>。"
+  prompt-item: "<prefix><gray>你想收購什麼物品？請在聊天欄輸入物品 ID，或輸入 <white>hand</white> 使用手上的物品。"
+  prompt-amount: "<prefix><gray>要收購幾個 <white><item></white>？<dark_gray>（上限 <max>）"
+  prompt-price: "<prefix><gray>每個 <white><item></white> 願意付多少錢？"
+  success: "<prefix><green>收購單 #<id> 已建立：<white><amount> 個 <item></white>，每個 <white><price></white>。已先保管 <white><total></white>，成交時付給交貨者。"
+  invalid-amount: "<prefix><red>數量必須介於 1 到 <max>。"
+  price-too-low: "<prefix><red>單價最低為 <white><min></white>。"
+  price-too-high: "<prefix><red>單價最高為 <white><max></white>。"
+  too-expensive: "<prefix><red>這張收購單金額太大了。"
+  limit-reached: "<prefix><red>你已經有 <white><limit></white> 張進行中的收購單，請先取消或等它完成。"
+  no-money: "<prefix><red>建立這張收購單需要 <white><cost></white>。"
+
+deliver:
+  success: "<prefix><green>已交付 <white><accepted> 個 <item></white> 給 <white><owner></white>，獲得 <white><payout></white>。"
+  nothing: "<prefix><gray>你沒有放入符合的物品。"
+  unavailable: "<prefix><red>這張收購單已經結束了。"
+  own-order: "<prefix><red>不能交貨給自己的收購單。"
+  payment-failed: "<prefix><red>付款失敗，物品已退還給你。"
+  rejected: "<prefix><yellow>有 <count> 個物品不符合收購單，已退還。只接受原版物品：不能改名、附魔或有耐久損耗。"
+
+cancel:
+  usage: "<prefix><gray>用法：<white>/orders cancel [編號]"
+  success: "<prefix><green>收購單 #<id> 已取消，退回 <white><refund></white>。"
+  not-found: "<prefix><red>找不到收購單 #<id>。"
+  not-owner: "<prefix><red>這不是你的收購單。"
+  not-active: "<prefix><red>這張收購單已經結束了。"
+  refund-failed: "<prefix><red>退款失敗，收購單維持開啟。請通知管理員。"
+
+collect:
+  success: "<prefix><green>已領取 <white><count> 個 <item></white>。"
+  inventory-full: "<prefix><yellow>背包滿了，剩下的物品會留在收購單裡。"
+
+notify:
+  delivered: "<prefix><white><player></white> <gray>交付了 <white><accepted> 個 <item></white> 到你的收購單 #<id>。"
+  completed: "<prefix><green>你收購的 <white><amount> 個 <item></white> 已經全部到貨！<click:run_command:/orders mine><hover:show_text:'開啟我的收購單'><u>點此領取</u></hover></click>"
+  expired: "<prefix><yellow>你的收購單 #<id>（<white><item></white>）已到期，退回 <white><refund></white>。"
+  waiting: "<prefix><gray>你有 <white><count></white> 個物品等待領取。<click:run_command:/orders mine><hover:show_text:'開啟我的收購單'><green><u>點此領取</u></green></hover></click>"
+
+gui:
+  previous-page: "<gray>« 上一頁 <dark_gray>（<page>/<pages>）"
+  next-page: "<gray>下一頁 » <dark_gray>（<page>/<pages>）"
+  sort:
+    price: "單價最高"
+    recent: "最新上架"
+    payout: "總額最高"
+  status:
+    active: "<green>進行中"
+    completed: "<aqua>已完成"
+    cancelled: "<red>已取消"
+    expired: "<yellow>已到期"
+  confirm:
+    accept: "<green><bold>確認"
+    deny: "<red><bold>取消"
+
+  browse:
+    title: "收購市場"
+    empty: "<gray>目前沒有收購單"
+    no-results: "<gray>找不到「<white><filter></white>」的收購單"
+    order:
+      lore:
+        - "<gray>買家：<white><owner>"
+        - "<gray>單價：<green><price>"
+        - ""
+        - "<bar> <white><delivered></white><gray>/<amount>"
+        - "<gray>可賺金額：<green><payout>"
+        - "<gray>剩餘時間：<white><expires>"
+        - ""
+      deliver:
+        - "<yellow>點擊交貨"
+      own:
+        - "<gray>這是你的收購單"
+    sort:
+      name: "<white>排序"
+      selected: ["<green>▶ <sort>"]
+      option: ["<gray>  <sort>"]
+      hint: ["", "<yellow>點擊切換"]
+    search:
+      name: "<white>搜尋"
+      lore:
+        - "<gray>搜尋某個物品的收購單"
+        - ""
+        - "<yellow>點擊搜尋"
+      lore-active:
+        - "<gray>目前顯示：<white><filter>"
+        - ""
+        - "<yellow>點擊重新搜尋"
+        - "<yellow>右鍵清除搜尋"
+    mine:
+      name: "<white>我的收購單"
+      lore:
+        - "<gray>進行中：<white><active>"
+        - "<gray>待領取物品：<white><uncollected>"
+        - ""
+        - "<yellow>點擊查看"
+    create:
+      name: "<green>建立收購單"
+      lore:
+        - "<gray>掛出收購單，讓其他玩家"
+        - "<gray>把物品送來給你。"
+        - ""
+        - "<yellow>點擊開始"
+
+  deliver:
+    title: "交貨 <item>（剩 <remaining> 個，每個 <price>）"
+
+  mine:
+    title: "我的收購單"
+    empty: "<gray>你還沒有收購單"
+    back: "<white>返回收購市場"
+    collect-all: "<green>全部領取"
+    order:
+      lore:
+        - "<gray>收購單 #<id> · <status>"
+        - "<gray>單價：<green><price>"
+        - ""
+        - "<bar> <white><delivered></white><gray>/<amount>"
+        - "<gray>待領取：<white><uncollected>"
+        - "<gray>保管中金額：<green><escrow>"
+        - "<gray>剩餘時間：<white><expires>"
+        - ""
+      collect:
+        - "<yellow>點擊領取物品"
+      cancel:
+        - "<red>Shift + 右鍵取消收購單"
+
+  cancel:
+    title: "確定取消這張收購單？"
+    summary:
+      name: "<white>取消收購單 #<id>"
+      lore:
+        - "<gray>退回金額：<green><refund>"
+        - "<gray>已交付的物品仍可領取。"
+
+  create:
+    title: "確定建立這張收購單？"
+    summary:
+      name: "<white><amount> 個 <item>"
+      lore:
+        - "<gray>單價：<green><price>"
+        - "<gray>現在支付：<green><total>"
+        - "<gray>有效期限：<white><expires>"
+        - ""
+        - "<gray>取消或到期時，"
+        - "<gray>未成交的部分會退款。"
+      lore-fee:
+        - "<gray>單價：<green><price>"
+        - "<gray>現在支付：<green><total>"
+        - "<gray>含手續費：<red><fee></red> <dark_gray>（不退還）"
+        - "<gray>有效期限：<white><expires>"
+        - ""
+        - "<gray>取消或到期時，"
+        - "<gray>未成交的部分會退款。"

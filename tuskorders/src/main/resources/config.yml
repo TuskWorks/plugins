@@ -1,0 +1,64 @@
+# TuskOrders — SMP-style buy orders
+# Players post what they want to buy; anyone can deliver and gets paid instantly.
+# Requires Vault and an economy plugin.
+
+# Message language: en, zh_TW (files in lang/ can be edited or copied)
+language: en
+
+command:
+  # /orders is always registered; these work too
+  aliases: [order]
+
+currency-symbol: "$"
+
+orders:
+  # Most items a single order can ask for
+  max-amount: 100000
+  # Price limits per item (accepts 0.5, 10, 1k, 2.5m ...)
+  min-price-each: "0.01"
+  max-price-each: "1b"
+  # Unfilled orders close after this many days and refund the rest. 0 = never.
+  expire-after-days: 7
+  # Charged on top of the order total when placing it; not refunded. Money sink.
+  creation-fee-percent: 0
+  # Taken from each payout to the deliverer. Money sink.
+  delivery-tax-percent: 0
+
+limits:
+  # Open orders per player. Give more with tuskorders.limit.<number>,
+  # or tuskorders.limit.unlimited
+  default-active-orders: 5
+
+# Items nobody can place orders for. * matches anything, e.g. "*_SPAWN_EGG".
+# Only plain items count as a delivery (no renamed, enchanted, damaged or filled items),
+# so items that are never plain in survival are blocked here too.
+blacklist:
+  - "*_SPAWN_EGG"
+  - SPAWNER
+  - TRIAL_SPAWNER
+  - VAULT
+  - BEDROCK
+  - BARRIER
+  - LIGHT
+  - STRUCTURE_VOID
+  - STRUCTURE_BLOCK
+  - JIGSAW
+  - "*COMMAND_BLOCK*"
+  - DEBUG_STICK
+  - KNOWLEDGE_BOOK
+  - END_PORTAL_FRAME
+  - REINFORCED_DEEPSLATE
+  - BUDDING_AMETHYST
+  - FARMLAND
+  - PETRIFIED_OAK_SLAB
+  - PLAYER_HEAD
+  - POTION
+  - SPLASH_POTION
+  - LINGERING_POTION
+  - TIPPED_ARROW
+  - ENCHANTED_BOOK
+  - WRITTEN_BOOK
+  - FILLED_MAP
+  - SUSPICIOUS_STEW
+  - OMINOUS_BOTTLE
+  - GOAT_HORN
