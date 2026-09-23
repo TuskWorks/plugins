@@ -18,3 +18,14 @@ node_modules/
 # OS
 .DS_Store
 Thumbs.db
+
+# Worktrees used by parallel sessions
+.claude/worktrees/
+
+# E2E harness caches
+e2e/.servers/
+e2e/.run/
+e2e/.jdks/
+
+# E2E local run logs
+e2e/*.log
