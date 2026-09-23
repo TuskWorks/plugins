@@ -81,6 +81,7 @@ class Server {
     fs.writeFileSync(path.join(this.dir, 'server.properties'), [
       'online-mode=false',
       'enforce-secure-profile=false',
+      'white-list=false',
       `server-port=${this.port}`,
       'level-type=minecraft\\:flat',
       'generate-structures=false',
