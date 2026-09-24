@@ -87,10 +87,10 @@ These item keys are supported: `material`, `amount`, `name`, `lore`, `enchantmen
 
 | Server | Supported | Tested on real servers |
 |---|---|---|
-| Paper | 1.21.4 – 26.3 | 1.21.4, 1.21.11, 26.1.2 (bot) · 26.2, 26.3 (console) |
+| Paper | 1.21.4 – 26.3 | 1.21.4, 1.21.11, 26.1.2 (bot) · 26.3 (console) |
 | Folia | 1.21.4 – 26.x | 1.21.11, 26.1.2 (bot) |
 
-The bot tests place crates, open them with each key type and animation, close menus early, disconnect mid-animation and check what ends up on disk.
+The sources are also compiled against the Paper 26.2 API on every change. The bot tests place crates, open them with each key type and animation, close menus early, disconnect mid-animation and check what ends up on disk.
 
 ## Building
 

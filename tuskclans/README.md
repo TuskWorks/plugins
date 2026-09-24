@@ -82,5 +82,5 @@ The jar lands in `tuskclans/build/libs/`. End-to-end tests with real clients liv
 ---
 
 Developed by TuskWorks with AI assistance (Claude). Every release is checked by unit tests,
-end-to-end tests with real Minecraft clients on Paper 1.21.11, Paper 26.1.2 and Folia 1.21.11,
-and a server smoke test on Paper 26.3.
+end-to-end tests with real Minecraft clients on Paper 1.21.4, 1.21.11 and 26.1.2 and on Folia
+1.21.11 and 26.1.2, a server smoke test on Paper 26.3, and a compile check against the Paper 26.2 API.
