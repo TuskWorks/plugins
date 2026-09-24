@@ -514,8 +514,12 @@ public final class ClanService {
         }
     }
 
-    /** Writes clans whose stats changed since the last flush. */
-    public void flushDirty() {
+    /**
+     * Writes clans whose stats changed since the last flush. Synchronized with the mutating
+     * methods: otherwise a snapshot taken here could be queued after a newer save or a
+     * disband's delete, and bring back stale members or a disbanded clan on restart.
+     */
+    public synchronized void flushDirty() {
         for (UUID id : Set.copyOf(dirty)) {
             dirty.remove(id);
             Clan clan = byId.get(id);
