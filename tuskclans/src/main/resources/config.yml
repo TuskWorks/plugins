@@ -1,0 +1,50 @@
+# TuskClans configuration
+# Docs: https://github.com/TuskWorks/plugins/tree/main/tuskclans
+
+# Message file under plugins/TuskClans/lang/ (bundled: en, zh_TW)
+language: en
+
+command:
+  # Extra names for /clan. Changes need a restart.
+  # SMP-style servers often add "team" here (the vanilla command stays available as /minecraft:team).
+  aliases: [clans]
+
+clan:
+  tag:
+    min-length: 2
+    max-length: 6
+    # Regular expression every tag must match.
+    pattern: '^[A-Za-z0-9]+$'
+  name-max-length: 24
+  # -1 = unlimited
+  max-members: 20
+  # -1 = unlimited, 0 = alliances disabled
+  max-allies: 3
+  # How long invites and alliance requests stay valid.
+  invite-expire-seconds: 120
+  # Cost to create a clan (requires Vault + an economy plugin). 0 = free.
+  create-cost: 0
+
+friendly-fire:
+  # Whether new clans start with friendly fire on.
+  default: false
+  # Allied clans can't hurt each other either.
+  protect-allies: true
+
+home:
+  enabled: true
+  warmup-seconds: 3
+  cooldown-seconds: 30
+  cancel-on-move: true
+
+chat:
+  # Show the clan tag in front of names in public chat.
+  # Turn this off if your chat plugin shows %tuskclans_tag_formatted% instead.
+  show-tag: true
+  tag-format: '<gray>[<white><tag></white>]</gray> '
+
+# Clan homes and friendly-fire protection are disabled in these worlds.
+disabled-worlds: []
+
+# How often kill/death stats are written to disk.
+autosave-seconds: 60
