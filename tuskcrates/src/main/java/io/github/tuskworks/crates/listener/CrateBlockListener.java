@@ -24,11 +24,17 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class CrateBlockListener implements Listener {
 
+    private static final long BREAK_HINT_COOLDOWN_MS = 60_000;
+
     private final TuskCratesPlugin plugin;
+    private final Map<UUID, Long> lastBreakHint = new ConcurrentHashMap<>();
 
     public CrateBlockListener(TuskCratesPlugin plugin) {
         this.plugin = plugin;
@@ -47,8 +53,8 @@ public final class CrateBlockListener implements Listener {
             return;
         }
         Player player = event.getPlayer();
-        if (event.getAction() == Action.LEFT_CLICK_BLOCK && player.isSneaking()
-                && player.hasPermission("tuskcrates.admin")) {
+        boolean admin = player.hasPermission("tuskcrates.admin");
+        if (event.getAction() == Action.LEFT_CLICK_BLOCK && player.isSneaking() && admin) {
             return; // let admins break the crate
         }
         event.setCancelled(true);
@@ -57,8 +63,26 @@ public final class CrateBlockListener implements Listener {
         }
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             plugin.openService().openAtBlock(player, crate.get(), pos);
-        } else if (event.getAction() == Action.LEFT_CLICK_BLOCK && player.hasPermission("tuskcrates.use")) {
-            new PreviewMenu(plugin, crate.get()).open(player);
+        } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            if (admin) {
+                sendBreakHint(player);
+            }
+            if (player.hasPermission("tuskcrates.use")) {
+                new PreviewMenu(plugin, crate.get()).open(player);
+            }
+        }
+    }
+
+    /**
+     * Cancelling the left-click stops the break before a BlockBreakEvent exists, so this is where
+     * admins learn how to remove a crate. Rate-limited, since admins also left-click to preview.
+     */
+    private void sendBreakHint(Player player) {
+        long now = System.currentTimeMillis();
+        Long previous = lastBreakHint.get(player.getUniqueId());
+        if (previous == null || now - previous >= BREAK_HINT_COOLDOWN_MS) {
+            lastBreakHint.put(player.getUniqueId(), now);
+            plugin.messages().send(player, "admin.break-hint");
         }
     }
 
