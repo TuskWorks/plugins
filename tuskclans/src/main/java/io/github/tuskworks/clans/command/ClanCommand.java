@@ -157,17 +157,28 @@ public final class ClanCommand implements BasicCommand {
         }
         String tag = args[0];
         String name = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+        // Validate first so typos never touch the player's balance
+        Optional<Outcome> invalid = service().validateCreate(player.getUniqueId(), tag, name);
+        if (invalid.isPresent()) {
+            reply(player, invalid.get());
+            return;
+        }
         double cost = config().createCost();
         EconomyHook economy = plugin.economy();
         boolean charge = cost > 0 && economy != null && !player.hasPermission("tuskclans.bypass.cost");
-        if (charge && !economy.has(player, cost)) {
+        if (charge && !economy.withdraw(player, cost)) {
             messages().send(player, "error.insufficient-funds", "cost", economy.format(cost));
             return;
         }
         Outcome outcome = service().create(player.getUniqueId(), player.getName(), tag, name);
-        if (outcome.success() && charge) {
-            economy.withdraw(player, cost);
-            messages().send(player, "create.charged", "cost", economy.format(cost));
+        if (charge) {
+            if (outcome.success()) {
+                messages().send(player, "create.charged", "cost", economy.format(cost));
+            } else if (!economy.deposit(player, cost)) {
+                // Only reachable if the tag was taken between the check and the create
+                plugin.getLogger().severe("Could not refund " + economy.format(cost) + " to " + player.getName()
+                        + " after a failed clan creation; please compensate manually");
+            }
         }
         reply(player, outcome);
     }

@@ -74,6 +74,17 @@ class ClanServiceTest {
     }
 
     @Test
+    void validateCreateChecksWithoutCreating() {
+        assertTrue(service.validateCreate(alice, "TUSK", "Tusk Clan").isEmpty());
+        assertTrue(service.clanOf(alice).isEmpty(), "validation alone must not create anything");
+        assertTrue(storage.saved.isEmpty());
+        assertEquals("error.tag-invalid", service.validateCreate(alice, "<b>", "x").orElseThrow().key());
+        createClan(alice, "Alice", "TUSK");
+        assertEquals("error.tag-taken", service.validateCreate(bob, "tusk", "x").orElseThrow().key());
+        assertEquals("error.already-in-clan", service.validateCreate(alice, "NEW", "x").orElseThrow().key());
+    }
+
+    @Test
     void customTagPatternIsRespected() {
         service.settings(new ClanSettings(2, 6, Pattern.compile("^[A-Z]+$"), 24, 20, 3,
                 Duration.ofMinutes(2), false, true));

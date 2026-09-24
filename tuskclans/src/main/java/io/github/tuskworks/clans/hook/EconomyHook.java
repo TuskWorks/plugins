@@ -23,12 +23,13 @@ public final class EconomyHook {
         return provider == null ? null : new EconomyHook(provider.getProvider());
     }
 
-    public boolean has(Player player, double amount) {
-        return economy.has(player, amount);
+    /** Takes the money if the player has it; false means nothing was taken. */
+    public boolean withdraw(Player player, double amount) {
+        return economy.has(player, amount) && economy.withdrawPlayer(player, amount).transactionSuccess();
     }
 
-    public boolean withdraw(Player player, double amount) {
-        return economy.withdrawPlayer(player, amount).transactionSuccess();
+    public boolean deposit(Player player, double amount) {
+        return economy.depositPlayer(player, amount).transactionSuccess();
     }
 
     public String format(double amount) {

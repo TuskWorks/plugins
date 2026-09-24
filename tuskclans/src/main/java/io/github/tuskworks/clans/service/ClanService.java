@@ -124,24 +124,37 @@ public final class ClanService {
 
     // ---- lifecycle -----------------------------------------------------------------------
 
-    public synchronized Outcome create(UUID actor, String actorName, String tag, String name) {
+    /**
+     * Checks whether {@link #create} would succeed right now, so callers can charge a creation
+     * cost only for requests that can go through.
+     */
+    public synchronized Optional<Outcome> validateCreate(UUID actor, String tag, String name) {
         if (byMember.containsKey(actor)) {
-            return Outcome.fail("error.already-in-clan");
+            return Optional.of(Outcome.fail("error.already-in-clan"));
         }
         ClanSettings s = settings;
         if (tag.length() < s.tagMinLength() || tag.length() > s.tagMaxLength()) {
-            return Outcome.fail("error.tag-length",
-                    "min", String.valueOf(s.tagMinLength()), "max", String.valueOf(s.tagMaxLength()));
+            return Optional.of(Outcome.fail("error.tag-length",
+                    "min", String.valueOf(s.tagMinLength()), "max", String.valueOf(s.tagMaxLength())));
         }
         if (!s.tagPattern().matcher(tag).matches()) {
-            return Outcome.fail("error.tag-invalid");
+            return Optional.of(Outcome.fail("error.tag-invalid"));
         }
         if (name.isBlank() || name.length() > s.nameMaxLength() || name.chars().anyMatch(Character::isISOControl)) {
-            return Outcome.fail("error.name-length", "max", String.valueOf(s.nameMaxLength()));
+            return Optional.of(Outcome.fail("error.name-length", "max", String.valueOf(s.nameMaxLength())));
         }
         if (byTag.containsKey(normalize(tag))) {
-            return Outcome.fail("error.tag-taken", "tag", tag);
+            return Optional.of(Outcome.fail("error.tag-taken", "tag", tag));
         }
+        return Optional.empty();
+    }
+
+    public synchronized Outcome create(UUID actor, String actorName, String tag, String name) {
+        Optional<Outcome> invalid = validateCreate(actor, tag, name);
+        if (invalid.isPresent()) {
+            return invalid.get();
+        }
+        ClanSettings s = settings;
         long now = clock.millis();
         Clan clan = new Clan(UUID.randomUUID(), tag, name.strip(), now);
         clan.friendlyFire(s.defaultFriendlyFire());

@@ -252,6 +252,10 @@ module.exports = {
       await r(alice, '/clan create RICH Rich', /Creating a clan costs/)
       await r(alice, '/clan info', /You are not in a clan/)
       await h.consoleRun(server, 'testeco set Alice 150', /balance Alice set to 150/)
+      // Requests that can't succeed are rejected before any money moves
+      await r(alice, '/clan create TUSK Copycats', /The tag TUSK is already taken/)
+      await r(alice, '/clan create RI! Rich', /contains characters that are not allowed/)
+      await h.consoleRun(server, 'testeco balance Alice', /balance Alice = 150\.00/)
       await r(alice, '/clan create RICH Rich', /Paid .* to create the clan|Clan \[RICH\] Rich created/)
       await alice.expect(/Clan \[RICH\] Rich created/)
       await h.consoleRun(server, 'testeco balance Alice', /balance Alice = 50\.00/)
