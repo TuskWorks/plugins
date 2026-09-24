@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -122,12 +123,12 @@ public final class ClanCommand implements BasicCommand {
                     tag -> reply(player, service().join(player.getUniqueId(), player.getName(), tag)));
             case "leave" -> {
                 Outcome outcome = service().leave(player.getUniqueId());
-                if (outcome.success()) {
-                    plugin.chat().reset(player.getUniqueId());
-                }
                 reply(player, outcome);
+                if (outcome.success()) {
+                    plugin.chat().leftClan(player.getUniqueId());
+                }
             }
-            case "kick" -> requireArg(player, rest, "kick", name -> reply(player, service().kick(player.getUniqueId(), name)));
+            case "kick" -> requireArg(player, rest, "kick", name -> kick(player, name));
             case "promote" -> requireArg(player, rest, "promote",
                     name -> reply(player, service().promote(player.getUniqueId(), name)));
             case "demote" -> requireArg(player, rest, "demote",
@@ -196,6 +197,17 @@ public final class ClanCommand implements BasicCommand {
         reply(player, service().invite(player.getUniqueId(), target.getUniqueId(), target.getName()));
     }
 
+    private void kick(Player player, String targetName) {
+        Optional<UUID> target = service().clanOf(player.getUniqueId())
+                .flatMap(clan -> ClanService.memberByName(clan, targetName))
+                .map(ClanMember::id);
+        Outcome outcome = service().kick(player.getUniqueId(), targetName);
+        reply(player, outcome);
+        if (outcome.success()) {
+            target.ifPresent(plugin.chat()::leftClan);
+        }
+    }
+
     private void transfer(Player player, String[] args) {
         if (args.length < 1) {
             usage(player, "transfer");
@@ -218,7 +230,12 @@ public final class ClanCommand implements BasicCommand {
             messages().send(player, "disband.confirm", "tag", clan.get().tag());
             return;
         }
-        reply(player, service().disband(player.getUniqueId()));
+        List<UUID> members = memberIds(clan.get());
+        Outcome outcome = service().disband(player.getUniqueId());
+        reply(player, outcome);
+        if (outcome.success()) {
+            members.forEach(plugin.chat()::leftClan);
+        }
     }
 
     private void channel(Player player, String[] args, boolean ally) {
@@ -366,7 +383,12 @@ public final class ClanCommand implements BasicCommand {
                     usage(sender, "admin-disband");
                     return;
                 }
-                messages().send(sender, service().adminDisband(args[1]));
+                List<UUID> members = service().byTag(args[1]).map(ClanCommand::memberIds).orElse(List.of());
+                Outcome outcome = service().adminDisband(args[1]);
+                messages().send(sender, outcome);
+                if (outcome.success()) {
+                    members.forEach(plugin.chat()::leftClan);
+                }
             }
             default -> usage(sender, "admin");
         }
@@ -447,6 +469,10 @@ public final class ClanCommand implements BasicCommand {
             return;
         }
         action.accept(args[0]);
+    }
+
+    private static List<UUID> memberIds(Clan clan) {
+        return clan.members().stream().map(ClanMember::id).toList();
     }
 
     private static String optionalArg(String[] args) {

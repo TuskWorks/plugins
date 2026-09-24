@@ -63,9 +63,12 @@ module.exports = {
     await step('officers kick members; members cannot kick', async () => {
       await r(dave, '/clan kick Bob', /rank is too low/)
       await r(alice, '/clan promote Bob', /Bob is now an officer/)
+      await r(dave, '/clan chat', /talking in clan chat/)
       const d = dave.mark()
       await r(bob, '/clan kick Dave', /Kicked Dave from the clan/)
       await dave.expect(/You were kicked from TUSK by Bob/, { since: d })
+      // A kicked player in clan chat mode is switched back to public chat and told so
+      await dave.expect(/talking in public chat/, { since: d })
       await r(dave, '/clan info', /You are not in a clan/)
     })
 
@@ -272,9 +275,11 @@ module.exports = {
     await step('admins can disband any clan', async () => {
       await r(bob, '/clan ally MAMO', /Alliance request sent|already allied/)
       await r(carol, '/clan info MAMO', /Allies: TUSK/)
+      await r(carol, '/clan allychat', /talking in ally chat/)
       const c = carol.mark()
       await h.consoleRun(server, 'clan admin disband MAMO', /Disbanded MAMO/)
       await carol.expect(/Your clan MAMO has been disbanded/, { since: c })
+      await carol.expect(/talking in public chat/, { since: c })
       await r(bob, '/clan info TUSK', /Allies: none/)
       await r(carol, '/clan info MAMO', /No clan with the tag MAMO/)
     })

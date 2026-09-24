@@ -48,6 +48,21 @@ public final class ClanChat {
         modes.remove(playerId);
     }
 
+    /**
+     * The player is no longer in a clan (left, kicked or disbanded). If they were talking in a
+     * clan channel, switch them back to public chat and tell them, so their next message is
+     * neither swallowed nor sent publicly by surprise.
+     */
+    public void leftClan(UUID playerId) {
+        if (modes.remove(playerId) == null) {
+            return;
+        }
+        Player player = Bukkit.getPlayer(playerId);
+        if (player != null) {
+            messages.send(player, "chat.mode-public");
+        }
+    }
+
     /** Sends a message to the sender's clan (and allies when {@code ally} is set). */
     public boolean send(Player sender, Component message, boolean ally) {
         Clan clan = service.clanOf(sender.getUniqueId()).orElse(null);
