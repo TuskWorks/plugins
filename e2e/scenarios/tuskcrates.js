@@ -119,9 +119,10 @@ module.exports = {
       await h.until(() => spinning() === 1, 'no item display spawned', 3000)
       await bot.expect(/You won/, { since, timeout: 15_000 })
       await h.until(() => spinning() === 0, 'item display was not removed', 8000)
-      if (h.entitiesNear(bot, 'text_display', at.legendary.offset(0, 1, 0), 1.5).length !== 1) {
-        throw new Error('reveal label was not removed (or the hologram vanished)')
-      }
+      // The item and the reveal label go in the same tick but reach the client as separate
+      // packets, so wait for the label too: only the crate's own hologram should remain.
+      await h.until(() => h.entitiesNear(bot, 'text_display', at.legendary.offset(0, 1, 0), 1.5).length === 1,
+        'reveal label was not removed (or the hologram vanished)', 3000)
     })
 
     await step('left-click opens a read-only preview', async () => {
