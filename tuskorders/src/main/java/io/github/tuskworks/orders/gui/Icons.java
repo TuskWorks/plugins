@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-final class Icons {
+public final class Icons {
 
     private static final int BAR_LENGTH = 20;
 
@@ -42,8 +42,8 @@ final class Icons {
         return "<green>" + "|".repeat(filled) + "<dark_gray>" + "|".repeat(BAR_LENGTH - filled);
     }
 
-    /** Compact time left, e.g. {@code 3d 4h}, {@code 5h 12m} or {@code 42m}. */
-    static String timeLeft(Duration left) {
+    /** Compact duration, e.g. {@code 7d}, {@code 3d 4h}, {@code 12h}, {@code 5h 12m} or {@code 42m}. */
+    public static String timeLeft(Duration left) {
         if (left.isNegative() || left.isZero()) {
             return "0m";
         }
@@ -51,10 +51,10 @@ final class Icons {
         long hours = left.toHoursPart();
         long minutes = left.toMinutesPart();
         if (days > 0) {
-            return days + "d " + hours + "h";
+            return hours > 0 ? days + "d " + hours + "h" : days + "d";
         }
         if (hours > 0) {
-            return hours + "h " + minutes + "m";
+            return minutes > 0 ? hours + "h " + minutes + "m" : hours + "h";
         }
         return Math.max(1, minutes) + "m";
     }

@@ -2,6 +2,7 @@ package io.github.tuskworks.orders.prompt;
 
 import io.github.tuskworks.orders.TuskOrders;
 import io.github.tuskworks.orders.gui.ConfirmMenu;
+import io.github.tuskworks.orders.gui.Icons;
 import io.github.tuskworks.orders.item.ItemRules;
 import io.github.tuskworks.orders.money.Money;
 import io.github.tuskworks.orders.service.OrderSettings;
@@ -117,7 +118,7 @@ public final class CreateFlow {
                 "price", money.format(priceEach),
                 "total", money.format(total + fee),
                 "fee", money.format(fee),
-                "expires", settings.expiry().isZero() ? "-" : settings.expiry().toDays() + "d");
+                "expires", settings.expiry().isZero() ? "-" : Icons.timeLeft(settings.expiry()));
 
         ItemStack summary = new ItemStack(material);
         ItemMeta meta = summary.getItemMeta();
