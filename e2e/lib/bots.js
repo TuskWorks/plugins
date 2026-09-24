@@ -6,9 +6,10 @@ const mineflayer = require('mineflayer')
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 class TestBot {
-  constructor (bot) {
+  /** `name` is needed until the bot has logged in; bot.username is only set by then. */
+  constructor (bot, name = bot.username) {
     this.bot = bot
-    this.name = bot.username
+    this.name = name
     this.messages = []
     // Servers that restyle chat (like our tag renderer) send the result as unsigned
     // content, which is what a real client displays — so prefer it when present.
@@ -21,13 +22,15 @@ class TestBot {
 
   static async join ({ host = '127.0.0.1', port, username, version }) {
     const bot = mineflayer.createBot({ host, port, username, version, auth: 'offline', hideErrors: false })
+    // Wrap before spawning so messages sent while joining (PlayerJoinEvent) are kept too.
+    const testBot = new TestBot(bot, username)
     await new Promise((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error(`${username} did not spawn in time`)), 60_000)
       bot.once('spawn', () => { clearTimeout(timer); resolve() })
       bot.once('kicked', reason => { clearTimeout(timer); reject(new Error(`${username} kicked: ${JSON.stringify(reason)}`)) })
       bot.once('error', err => { clearTimeout(timer); reject(err) })
     })
-    return new TestBot(bot)
+    return testBot
   }
 
   /** Index to pass as `since` so later expectations ignore older messages. */

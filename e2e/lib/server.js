@@ -56,6 +56,8 @@ class PaperServer {
   async start (timeoutMs = 240_000) {
     const mark = this.lines.length
     this.proc = spawn(this.java, ['-Xms1G', '-Xmx2G', '-Dpaper.disableChannelLimit=true',
+      // Windows consoles aren't UTF-8 by default, which garbles non-English messages
+      '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8',
       '-jar', this.jar, '--nogui'], { cwd: this.dir, stdio: ['pipe', 'pipe', 'pipe'] })
     // Chunks can end mid-line; keep the tail until its newline arrives.
     const partial = { stdout: '', stderr: '' }
@@ -70,6 +72,7 @@ class PaperServer {
         for (const w of [...this.waiters]) {
           if (w.re.test(line)) {
             this.waiters.splice(this.waiters.indexOf(w), 1)
+            clearTimeout(w.timer)
             w.resolve(line)
           }
         }
@@ -81,6 +84,11 @@ class PaperServer {
     const ready = this.waitFor(/Done \([\d.,]+s\)!/, timeoutMs, mark)
     const died = this.exited.then(code => { throw new Error(`Server exited early with code ${code}`) })
     await Promise.race([ready, died])
+    // Superflat slimes kill bots in longer runs. From 1.21.11 spawn-monsters in
+    // server.properties no longer applies, so switch natural spawning off by game rule:
+    // doMobSpawning up to 1.21.10, spawn_mobs from 1.21.11 (the other name is rejected).
+    this.command('gamerule doMobSpawning false')
+    this.command('gamerule spawn_mobs false')
   }
 
   /** Resolves with the first console line (at or after index `since`) matching `re`. */
@@ -90,7 +98,8 @@ class PaperServer {
     return new Promise((resolve, reject) => {
       const waiter = { re, resolve }
       this.waiters.push(waiter)
-      setTimeout(() => {
+      // Cleared on a match; a pending timer would keep node alive after the run.
+      waiter.timer = setTimeout(() => {
         const i = this.waiters.indexOf(waiter)
         if (i >= 0) {
           this.waiters.splice(i, 1)
