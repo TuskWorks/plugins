@@ -123,6 +123,26 @@ module.exports = {
       './gradlew :e2e-test-economy:build')
   ],
 
+  /** Console-only checks for server versions the bots can't join yet. */
+  async smoke ({ server, step }) {
+    const expectConsole = async (cmd, re) => {
+      const since = server.lines.length
+      server.command(cmd)
+      await server.waitFor(re, 5000, since)
+    }
+    await step('plugin enables and finds the Vault economy', async () => {
+      await server.waitFor(/\[TuskOrders\] Loaded 0 order\(s\)/, 1000, 0)
+      await server.waitFor(/\[TuskOrders\] Using economy/, 5000, 0)
+    })
+    await step('console commands', async () => {
+      await expectConsole('orders help', /orders cancel \[id\]/)
+      await expectConsole('orders reload', /Reloaded config and messages/)
+      await expectConsole('orders cancel 1', /There is no order #1/)
+      await expectConsole('orders mine', /Only players can do that/)
+      await expectConsole('orders nope', /Unknown subcommand nope/)
+    })
+  },
+
   async run ({ server, join, step }) {
     let buyer = await join('Buyer')
     let seller = await join('Seller')
