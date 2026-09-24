@@ -100,3 +100,5 @@ jobs:
         with:
           name: server-logs-${{ matrix.scenario }}-${{ matrix.server }}-${{ matrix.mc }}
           path: e2e/.run/*/logs/latest.log
+          # .run is a dot directory, which upload-artifact skips by default
+          include-hidden-files: true

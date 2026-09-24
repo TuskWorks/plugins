@@ -4,7 +4,7 @@
 const crypto = require('node:crypto')
 const fs = require('node:fs')
 const path = require('node:path')
-const { execFileSync } = require('node:child_process')
+const { execFileSync, spawnSync } = require('node:child_process')
 const { Readable } = require('node:stream')
 const { pipeline } = require('node:stream/promises')
 
@@ -75,12 +75,10 @@ async function modrinth (project, mcVersion, loader = 'paper') {
 }
 
 function javaMajor (javaBin) {
-  try {
-    const out = execFileSync(javaBin, ['-version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
-    return parseVersion(out)
-  } catch (e) {
-    return parseVersion(String(e.stderr ?? '')) // `java -version` prints to stderr
-  }
+  // `java -version` prints to stderr even when it succeeds, so read both streams;
+  // reading stdout alone made every installed JDK look like version 0.
+  const res = spawnSync(javaBin, ['-version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+  return parseVersion(`${res.stderr ?? ''}\n${res.stdout ?? ''}`)
 }
 
 function parseVersion (text) {

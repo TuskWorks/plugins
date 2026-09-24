@@ -116,8 +116,12 @@ class PaperServer {
   async stop () {
     if (!this.proc || this.proc.exitCode !== null) return
     this.command('stop')
-    const timeout = new Promise(resolve => setTimeout(() => resolve('timeout'), 60_000))
-    if (await Promise.race([this.exited, timeout]) === 'timeout') this.proc.kill('SIGKILL')
+    let timer
+    const timeout = new Promise(resolve => { timer = setTimeout(() => resolve('timeout'), 60_000) })
+    const result = await Promise.race([this.exited, timeout])
+    // A pending timer would keep node alive for up to 60s after the run has finished.
+    clearTimeout(timer)
+    if (result === 'timeout') this.proc.kill('SIGKILL')
   }
 
   async restart () {
