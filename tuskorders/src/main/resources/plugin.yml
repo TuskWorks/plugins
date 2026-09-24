@@ -1,0 +1,23 @@
+name: TuskOrders
+version: '${version}'
+main: io.github.tuskworks.orders.TuskOrders
+api-version: '1.21'
+folia-supported: true
+description: '${description}'
+author: TuskWorks
+website: https://github.com/TuskWorks/plugins
+depend: [Vault]
+
+permissions:
+  tuskorders.use:
+    description: Browse orders, deliver items and manage your own orders.
+    default: true
+  tuskorders.create:
+    description: Place new buy orders.
+    default: true
+  tuskorders.limit.unlimited:
+    description: No limit on open orders. Use tuskorders.limit.<number> for a specific limit.
+    default: false
+  tuskorders.admin:
+    description: Reload the plugin and cancel any order.
+    default: op

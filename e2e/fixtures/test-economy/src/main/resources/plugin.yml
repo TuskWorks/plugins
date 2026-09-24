@@ -1,0 +1,7 @@
+name: Vault
+version: 1.7.3-e2e
+main: io.github.tuskworks.e2e.economy.TestEconomyPlugin
+api-version: '1.21'
+folia-supported: true
+load: STARTUP
+description: E2E test fixture — in-memory Vault economy. Not for real servers.
