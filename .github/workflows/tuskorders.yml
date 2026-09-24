@@ -1,23 +1,23 @@
-name: TuskCrates
+name: TuskOrders
 
 on:
   push:
     branches: [main]
     paths:
-      - 'tuskcrates/**'
+      - 'tuskorders/**'
       - 'e2e/**'
       - 'gradle/**'
       - '*.gradle.kts'
       - 'gradle.properties'
-      - '.github/workflows/tuskcrates.yml'
+      - '.github/workflows/tuskorders.yml'
   pull_request:
     paths:
-      - 'tuskcrates/**'
+      - 'tuskorders/**'
       - 'e2e/**'
       - 'gradle/**'
       - '*.gradle.kts'
       - 'gradle.properties'
-      - '.github/workflows/tuskcrates.yml'
+      - '.github/workflows/tuskorders.yml'
   workflow_dispatch:
 
 permissions:
@@ -33,28 +33,18 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v6
-      - name: Build and unit test
-        run: ./gradlew :tuskcrates:build
+      # TuskOrders depends on Vault; the e2e scenarios use the in-memory test economy instead
+      - run: ./gradlew :tuskorders:build :e2e-test-economy:build
       - uses: actions/upload-artifact@v7
         with:
-          name: TuskCrates
-          path: tuskcrates/build/libs/TuskCrates-*.jar
+          name: TuskOrders
+          path: tuskorders/build/libs/TuskOrders-*.jar
           if-no-files-found: error
-
-  # The jar targets the 1.21.4 API; make sure the sources still compile against the newest API.
-  api-compat:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v6
+      - uses: actions/upload-artifact@v7
         with:
-          distribution: temurin
-          java-version: |
-            25
-            21
-      - uses: gradle/actions/setup-gradle@v6
-      - name: Compile against Paper API 26.2
-        run: ./gradlew :tuskcrates:compileJava -PpaperApi=26.2.build.128-stable
+          name: TestEconomy
+          path: e2e/fixtures/test-economy/build/libs/*.jar
+          if-no-files-found: error
 
   e2e:
     needs: build
@@ -66,14 +56,14 @@ jobs:
       matrix:
         # Bots up to 26.1.2 (the newest protocol mineflayer speaks); console smoke test on 26.3.
         include:
-          - { scenario: tuskcrates, server: paper, mc: '1.21.4' }
-          - { scenario: tuskcrates, server: paper, mc: '1.21.11' }
-          - { scenario: tuskcrates, server: paper, mc: '26.1.2' }
-          - { scenario: tuskcrates, server: paper, mc: '26.3' }
-          - { scenario: tuskcrates, server: folia, mc: '1.21.11' }
-          - { scenario: tuskcrates, server: folia, mc: '26.1.2' }
-          - { scenario: tuskcrates-extra, server: paper, mc: '26.1.2' }
-          - { scenario: tuskcrates-extra, server: folia, mc: '1.21.11' }
+          - { scenario: tuskorders, server: paper, mc: '1.21.4' }
+          - { scenario: tuskorders, server: paper, mc: '1.21.11' }
+          - { scenario: tuskorders, server: paper, mc: '26.1.2' }
+          - { scenario: tuskorders, server: paper, mc: '26.3' }
+          - { scenario: tuskorders, server: folia, mc: '1.21.11' }
+          - { scenario: tuskorders, server: folia, mc: '26.1.2' }
+          - { scenario: tuskorders-extra, server: paper, mc: '26.1.2' }
+          - { scenario: tuskorders-extra, server: folia, mc: '1.21.11' }
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v6
@@ -89,8 +79,12 @@ jobs:
           cache-dependency-path: e2e/package-lock.json
       - uses: actions/download-artifact@v8
         with:
-          name: TuskCrates
-          path: tuskcrates/build/libs
+          name: TuskOrders
+          path: tuskorders/build/libs
+      - uses: actions/download-artifact@v8
+        with:
+          name: TestEconomy
+          path: e2e/fixtures/test-economy/build/libs
       - run: npm ci
         working-directory: e2e
       - run: node run.js --scenario ${{ matrix.scenario }} --server ${{ matrix.server }} --mc ${{ matrix.mc }}

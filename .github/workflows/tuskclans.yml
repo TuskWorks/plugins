@@ -33,27 +33,37 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v6
-      - run: ./gradlew :tuskclans:build
+      # The test economy stands in for Vault in the creation cost step of tuskclans-extra
+      - run: ./gradlew :tuskclans:build :e2e-test-economy:build
       - uses: actions/upload-artifact@v7
         with:
           name: TuskClans
           path: tuskclans/build/libs/*.jar
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        with:
+          name: TestEconomy
+          path: e2e/fixtures/test-economy/build/libs/*.jar
           if-no-files-found: error
 
   e2e:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    name: e2e (${{ matrix.server }} ${{ matrix.mc }})
+    name: e2e ${{ matrix.scenario }} (${{ matrix.server }} ${{ matrix.mc }})
     strategy:
       fail-fast: false
       matrix:
-        # Bots on 1.21.11 and 26.1.2 (the newest protocol mineflayer speaks); console smoke test on 26.3.
+        # Bots up to 26.1.2 (the newest protocol mineflayer speaks); console smoke test on 26.3.
         include:
-          - { server: paper, mc: '1.21.11' }
-          - { server: paper, mc: '26.1.2' }
-          - { server: paper, mc: '26.3' }
-          - { server: folia, mc: '1.21.11' }
+          - { scenario: tuskclans, server: paper, mc: '1.21.4' }
+          - { scenario: tuskclans, server: paper, mc: '1.21.11' }
+          - { scenario: tuskclans, server: paper, mc: '26.1.2' }
+          - { scenario: tuskclans, server: paper, mc: '26.3' }
+          - { scenario: tuskclans, server: folia, mc: '1.21.11' }
+          - { scenario: tuskclans, server: folia, mc: '26.1.2' }
+          - { scenario: tuskclans-extra, server: paper, mc: '26.1.2' }
+          - { scenario: tuskclans-extra, server: folia, mc: '1.21.11' }
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v6
@@ -71,12 +81,16 @@ jobs:
         with:
           name: TuskClans
           path: tuskclans/build/libs
+      - uses: actions/download-artifact@v8
+        with:
+          name: TestEconomy
+          path: e2e/fixtures/test-economy/build/libs
       - run: npm ci
         working-directory: e2e
-      - run: node run.js --server ${{ matrix.server }} --mc ${{ matrix.mc }}
+      - run: node run.js --scenario ${{ matrix.scenario }} --server ${{ matrix.server }} --mc ${{ matrix.mc }}
         working-directory: e2e
       - if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: server-logs-${{ matrix.server }}-${{ matrix.mc }}
+          name: server-logs-${{ matrix.scenario }}-${{ matrix.server }}-${{ matrix.mc }}
           path: e2e/.run/*/logs/latest.log
