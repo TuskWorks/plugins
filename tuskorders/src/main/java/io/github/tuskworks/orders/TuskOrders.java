@@ -52,7 +52,7 @@ public final class TuskOrders extends JavaPlugin {
         service = new OrderService(config.orders(), config.money(), storage, bank, Clock.systemUTC(), getLogger());
         try {
             List<Order> orders = storage.loadAll();
-            service.load(orders);
+            service.load(orders, storage.loadNextId());
             getLogger().info("Loaded " + orders.size() + " order(s)");
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, "Could not load order data, disabling to protect it", e);

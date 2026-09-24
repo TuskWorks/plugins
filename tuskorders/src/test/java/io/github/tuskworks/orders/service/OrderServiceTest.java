@@ -271,7 +271,32 @@ class OrderServiceTest {
     void loadContinuesIdSequence() {
         int id = createDiamonds(1, 1_00);
         OrderService reloaded = newService(settings(0, 0, Duration.ZERO));
-        reloaded.load(storage.loadAll());
+        reloaded.load(storage.loadAll(), storage.loadNextId());
+
+        Outcome outcome = reloaded.create(BUYER, "Buyer", DIAMOND, 1, 1_00, 5);
+
+        assertEquals(String.valueOf(id + 1), outcome.vars().get("id"));
+    }
+
+    @Test
+    void idsOfDeletedOrdersAreNotReusedAfterRestart() {
+        int id = createDiamonds(1, 1_00);
+        assertTrue(service.cancel(id, BUYER, false).success());
+        assertTrue(storage.saved.isEmpty(), "a cancelled order with nothing to collect is deleted");
+
+        OrderService reloaded = newService(settings(0, 0, Duration.ZERO));
+        reloaded.load(storage.loadAll(), storage.loadNextId());
+        Outcome outcome = reloaded.create(BUYER, "Buyer", DIAMOND, 1, 1_00, 5);
+
+        assertEquals(String.valueOf(id + 1), outcome.vars().get("id"));
+    }
+
+    @Test
+    void loadTrustsOrderIdsOverAStaleSavedSequence() {
+        int id = createDiamonds(1, 1_00);
+        OrderService reloaded = newService(settings(0, 0, Duration.ZERO));
+        // e.g. the server stopped between writing the order and the sequence
+        reloaded.load(storage.loadAll(), 1);
 
         Outcome outcome = reloaded.create(BUYER, "Buyer", DIAMOND, 1, 1_00, 5);
 

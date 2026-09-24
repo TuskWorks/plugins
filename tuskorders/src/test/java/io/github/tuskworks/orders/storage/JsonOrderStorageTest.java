@@ -55,6 +55,28 @@ class JsonOrderStorageTest {
     }
 
     @Test
+    void nextIdRoundTripsAndIsNotLoadedAsAnOrder() throws Exception {
+        JsonOrderStorage storage = new JsonOrderStorage(dir, LOGGER);
+        assertEquals(1, storage.loadNextId(), "nothing saved yet");
+        Order a = order(4, 10, OrderStatus.ACTIVE);
+        storage.save(a);
+        storage.saveNextId(5);
+        storage.saveNextId(9);
+        storage.close();
+
+        JsonOrderStorage reopened = new JsonOrderStorage(dir, LOGGER);
+        assertEquals(9, reopened.loadNextId());
+        assertEquals(List.of(a), reopened.loadAll());
+    }
+
+    @Test
+    void unreadableNextIdFallsBackToOne() throws Exception {
+        Files.writeString(dir.resolve("next-id.txt"), "garbage");
+
+        assertEquals(1, new JsonOrderStorage(dir, LOGGER).loadNextId());
+    }
+
+    @Test
     void skipsCorruptFiles() throws Exception {
         Files.writeString(dir.resolve("7.json"), "{ not json");
         Files.writeString(dir.resolve("8.json"), "{\"id\":8,\"amount\":-1}");

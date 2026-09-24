@@ -13,6 +13,15 @@ public interface OrderStorage {
 
     void delete(int orderId);
 
+    /** The next order id to hand out as last saved, or 1 if none was saved yet. */
+    int loadNextId() throws IOException;
+
+    /**
+     * Remembers the next order id, so ids of finished (deleted) orders are never handed out
+     * again after a restart. Written in call order with {@link #save}.
+     */
+    void saveNextId(int nextId);
+
     /** Waits for pending writes. */
     void close();
 }

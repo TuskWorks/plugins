@@ -48,9 +48,14 @@ public final class OrderService {
         this.logger = logger;
     }
 
-    public void load(Collection<Order> loaded) {
+    /**
+     * @param savedNextId the id sequence as last persisted, so ids of orders that were already
+     *                    finished and deleted are never handed out again
+     */
+    public void load(Collection<Order> loaded, int savedNextId) {
         synchronized (lock) {
             orders.clear();
+            nextId = Math.max(1, savedNextId);
             for (Order order : loaded) {
                 orders.put(order.id(), order);
                 nextId = Math.max(nextId, order.id() + 1);
@@ -162,6 +167,7 @@ public final class OrderService {
                         OrderStatus.ACTIVE);
                 orders.put(order.id(), order);
                 storage.save(order);
+                storage.saveNextId(nextId);
             }
         }
         if (order == null) {

@@ -28,6 +28,8 @@ import java.util.logging.Logger;
 public final class JsonOrderStorage implements OrderStorage {
 
     private static final int FORMAT_VERSION = 1;
+    /** Not *.json, so {@link #loadAll} never mistakes it for an order. */
+    private static final String NEXT_ID_FILE = "next-id.txt";
 
     private final Path dir;
     private final Logger logger;
@@ -63,23 +65,46 @@ public final class JsonOrderStorage implements OrderStorage {
     @Override
     public void save(Order order) {
         String json = gson.toJson(OrderData.of(order));
-        int id = order.id();
-        submit(() -> {
-            Path target = file(id);
-            Path tmp = target.resolveSibling(target.getFileName() + ".tmp");
-            Files.createDirectories(dir);
-            Files.writeString(tmp, json, StandardCharsets.UTF_8);
-            try {
-                Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING);
-            }
-        });
+        Path target = file(order.id());
+        submit(() -> writeAtomically(target, json));
     }
 
     @Override
     public void delete(int orderId) {
         submit(() -> Files.deleteIfExists(file(orderId)));
+    }
+
+    @Override
+    public int loadNextId() throws IOException {
+        Path file = dir.resolve(NEXT_ID_FILE);
+        if (!Files.exists(file)) {
+            return 1;
+        }
+        String raw = Files.readString(file, StandardCharsets.UTF_8).trim();
+        try {
+            return Math.max(1, Integer.parseInt(raw));
+        } catch (NumberFormatException e) {
+            // The ids of the loaded orders still keep the sequence going
+            logger.warning("Ignoring unreadable " + NEXT_ID_FILE + " ('" + raw + "')");
+            return 1;
+        }
+    }
+
+    @Override
+    public void saveNextId(int nextId) {
+        String text = String.valueOf(nextId);
+        submit(() -> writeAtomically(dir.resolve(NEXT_ID_FILE), text));
+    }
+
+    private void writeAtomically(Path target, String content) throws IOException {
+        Path tmp = target.resolveSibling(target.getFileName() + ".tmp");
+        Files.createDirectories(dir);
+        Files.writeString(tmp, content, StandardCharsets.UTF_8);
+        try {
+            Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException e) {
+            Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     @Override

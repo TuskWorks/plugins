@@ -52,10 +52,21 @@ final class TestSupport {
 
     static final class MemoryStorage implements OrderStorage {
         final Map<Integer, Order> saved = new HashMap<>();
+        int nextId = 1;
 
         @Override
         public List<Order> loadAll() {
             return List.copyOf(saved.values());
+        }
+
+        @Override
+        public int loadNextId() {
+            return nextId;
+        }
+
+        @Override
+        public void saveNextId(int nextId) {
+            this.nextId = nextId;
         }
 
         @Override
