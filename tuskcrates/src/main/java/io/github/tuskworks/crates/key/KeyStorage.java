@@ -5,6 +5,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
@@ -134,8 +135,13 @@ public final class KeyStorage {
             Files.createDirectories(folder.toPath());
             File temp = new File(folder, player + ".yml.tmp");
             yaml.save(temp);
-            Files.move(temp.toPath(), target.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            try {
+                Files.move(temp.toPath(), target.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException e) {
+                // Some file systems (e.g. certain network mounts) can't rename atomically
+                Files.move(temp.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Could not save virtual keys of " + player, e);
         }
