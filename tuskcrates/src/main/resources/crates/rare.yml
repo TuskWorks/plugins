@@ -1,0 +1,58 @@
+# ─────────────────────────────────────────────
+#  Rare crate: gear upgrades
+# ─────────────────────────────────────────────
+
+display-name: "<gradient:#4facfe:#00f2fe><b>Rare</b></gradient>"
+animation: roulette
+show-in-menu: true
+
+key:
+  material: TRIPWIRE_HOOK
+  name: "<crate> <white>Key"
+  lore:
+    - "<gray>Right-click a <crate> <gray>crate"
+    - "<gray>to open it."
+  glow: true
+
+hologram:
+  - "<crate> <white>Crate"
+  - "<gray>Right-click with a key"
+  - "<dark_gray>Left-click to preview"
+
+rewards:
+  diamonds:
+    weight: 30
+    item:
+      material: DIAMOND
+      amount: 8
+  pickaxe:
+    weight: 20
+    item:
+      material: DIAMOND_PICKAXE
+      name: "<aqua>Miner's Pickaxe"
+      enchantments:
+        efficiency: 4
+        unbreaking: 3
+  sword:
+    weight: 20
+    item:
+      material: DIAMOND_SWORD
+      name: "<aqua>Duelist's Blade"
+      enchantments:
+        sharpness: 4
+        unbreaking: 3
+  mending:
+    weight: 15
+    item:
+      material: ENCHANTED_BOOK
+      enchantments:
+        mending: 1
+  shulker:
+    weight: 10
+    item:
+      material: SHULKER_BOX
+  totem:
+    weight: 5
+    item:
+      material: TOTEM_OF_UNDYING
+    broadcast: true

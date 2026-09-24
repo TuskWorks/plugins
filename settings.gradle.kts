@@ -6,6 +6,7 @@ plugins {
 rootProject.name = "tuskworks-plugins"
 
 include("tuskclans")
+include("tuskcrates")
 include("tuskorders")
 
 // Test-only Vault economy for e2e scenarios; never published

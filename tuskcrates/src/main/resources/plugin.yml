@@ -1,0 +1,19 @@
+name: TuskCrates
+version: '${version}'
+main: io.github.tuskworks.crates.TuskCratesPlugin
+description: '${description}'
+author: TuskWorks
+website: https://github.com/TuskWorks/plugins
+api-version: '1.21'
+folia-supported: true
+
+permissions:
+  tuskcrates.admin:
+    description: Manage crates, keys and crate blocks.
+    default: op
+  tuskcrates.use:
+    description: Open crates and preview rewards.
+    default: true
+  tuskcrates.menu:
+    description: Use the /crates menu.
+    default: true
