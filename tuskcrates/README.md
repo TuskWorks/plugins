@@ -98,13 +98,13 @@ The bot tests place crates, open them with each key type and animation, close me
 ./gradlew :tuskcrates:build
 ```
 
-The jar ends up in `tuskcrates/build/libs/`. To run the end-to-end tests:
+The jar ends up in `tuskcrates/build/libs/`. The end-to-end tests use the shared harness in [`../e2e`](../e2e):
 
 ```bash
-cd tuskcrates/e2e && npm install && node run.js --mc 1.21.11
+cd e2e && npm install && node run.js --scenario tuskcrates --mc 1.21.11
 ```
 
-Other options: `--mc 26.1.2`, `--folia`, `--mc 26.3` (console only).
+Other options: `--mc 26.1.2`, `--server folia`, `--mc 26.3` (console only), and `--scenario tuskcrates-extra` for the edge cases (broken crate files, explosions, pistons, crafting, autosave, restarts and more).
 
 ## AI disclosure
 
