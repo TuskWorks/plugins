@@ -79,6 +79,10 @@ Messages live in `plugins/TuskClans/lang/`; pick one with `language:`.
 
 The jar lands in `tuskclans/build/libs/`. End-to-end tests with real clients live in [`../e2e`](../e2e).
 
+## License
+
+TuskClans is licensed under the GNU General Public License v3.0 only (GPL-3.0-only). See [`LICENSE`](../LICENSE).
+
 ---
 
 Developed by TuskWorks with AI assistance (Claude). Every release is checked by unit tests,

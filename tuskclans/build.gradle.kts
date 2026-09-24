@@ -59,4 +59,6 @@ tasks.jar {
     archiveBaseName = "TuskClans"
     // No NMS here, so tell Paper there is nothing to remap (faster first start on 1.21.x).
     manifest.attributes("paperweight-mappings-namespace" to "mojang")
+    // GPL-3.0: every copy of the jar carries the license text
+    from(rootProject.file("LICENSE"))
 }

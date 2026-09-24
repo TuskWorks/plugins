@@ -109,3 +109,7 @@ Other options: `--mc 26.1.2`, `--server folia`, `--mc 26.3` (console only), and 
 ## AI disclosure
 
 TuskCrates is developed with the help of AI coding tools (Claude by Anthropic). Every release is tested on real Paper and Folia servers.
+
+## License
+
+TuskCrates is licensed under the GNU General Public License v3.0 only (GPL-3.0-only). See [`LICENSE`](../LICENSE).

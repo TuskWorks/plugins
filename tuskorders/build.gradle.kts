@@ -57,6 +57,8 @@ tasks {
         archiveBaseName = "TuskOrders"
         // Only API calls, no server internals: tells Paper it can skip remapping the jar.
         manifest.attributes("paperweight-mappings-namespace" to "mojang")
+        // GPL-3.0: every copy of the jar carries the license text
+        from(rootProject.file("LICENSE"))
     }
 
     // ./gradlew :tuskorders:runServer -PmcVersion=26.3

@@ -14,6 +14,8 @@ TuskWorks 的 Minecraft server plugin monorepo（GitHub: `TuskWorks/plugins`，p
 - 品質優先：不量產低品質 plugin
 - 依各平台的規定，如實揭露 AI 協助開發
 - 名稱、描述不使用其他伺服器的品牌（例如 "Donut"）；可以寫「SMP-style」
+- **License：本 repo 的免費 plugin 採 GPL-3.0-only**（根目錄 `LICENSE`，每個 jar 也會打包一份；各 README 有 License 段落）。上架平台的 license 欄位填 `GPL-3.0-only`；新增 plugin 時比照辦理
+- 付費版（`TuskWorks/premium`）另外授權。Tony 擁有本 repo 程式碼的著作權，可以把自己的程式碼用進付費版；但**外部貢獻者 PR 的程式碼不能搬進付費版**（除非對方簽了 CLA）
 
 ## 目標版本
 - **Paper 26.x**（目前最新是 26.3，需 Java 25），同時向下支援 **1.21.4+**（Java 21）
