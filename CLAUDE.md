@@ -23,7 +23,7 @@ TuskWorks 的 Minecraft server plugin monorepo（GitHub: `TuskWorks/plugins`，p
 
 ## 環境
 - JDK 21（Temurin，系統安裝）：用來跑 Gradle 和 1.21.x server
-- JDK 25：跑 26.x server 時需要。e2e harness 依序找 `E2E_JAVA_25`、`JAVA_HOME_25_X64`（setup-java 設的），都沒有就下載 Temurin 25 到 `e2e/.jdks/`。另外 TuskCrates 對新版 API 做相容性編譯（`-PpaperApi=26.2.build.128-stable`）時，由 Gradle toolchain（foojay）自動下載。平常編譯只用 JDK 21
+- JDK 25：跑 26.x server 時需要。e2e harness 依序找 `E2E_JAVA_25`、`JAVA_HOME_25_X64`（setup-java 設的），都沒有就下載 Temurin 25 到 `e2e/.jdks/`。另外對新版 API 做相容性編譯（三個 plugin 都支援 `-PpaperApi=26.2.build.128-stable`）時，由 Gradle toolchain（foojay）自動下載。平常編譯只用 JDK 21
 - Gradle 9.x wrapper（`./gradlew`）、gh CLI、Node（mineflayer 測試用）
 - Git Bash 的 PATH 可能沒有 `java`、`gh`，必要時用完整路徑（`C:\Program Files\GitHub CLI\gh.exe`）
 
@@ -42,4 +42,4 @@ TuskWorks 的 Minecraft server plugin monorepo（GitHub: `TuskWorks/plugins`，p
 - Build 加 unit test：`./gradlew build`（三個 plugin 加上 test economy）
 - E2E：`cd e2e && npm install && node run.js --scenario tuskcrates --mc 26.1.2`（scenario：`tuskclans`、`tuskcrates`、`tuskorders`，以及各自的 `-extra`；版本：`1.21.4`、`1.21.11`、`26.1.2`、`26.3`；加上 `E2E_VERBOSE=1` 可以看完整輸出）
 - E2E 測 Folia：`node run.js --scenario tuskorders --server folia --mc 1.21.11`
-- CI：`.github/workflows/tusk{clans,crates,orders}.yml`，各自跑 build、unit test，以及 e2e 矩陣（主要流程：Paper 1.21.4／1.21.11／26.1.2／26.3 smoke、Folia 1.21.11／26.1.2；延伸測試：Paper 26.1.2、Folia 1.21.11）。TuskCrates 另外對 Paper API 26.2 做相容性編譯
+- CI：`.github/workflows/tusk{clans,crates,orders}.yml`，各自跑 build、unit test，以及 e2e 矩陣（主要流程：Paper 1.21.4／1.21.11／26.1.2／26.3 smoke、Folia 1.21.11／26.1.2；延伸測試：Paper 26.1.2、Folia 1.21.11），另外都有 `api-compat` job 對 Paper API 26.2 做相容性編譯

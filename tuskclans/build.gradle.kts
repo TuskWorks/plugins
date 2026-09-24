@@ -4,6 +4,7 @@ plugins {
 
 group = "io.github.tuskworks"
 version = "0.1.0"
+description = "Lightweight clans & teams for SMP servers — chat, friendly fire, alliances, clan homes."
 
 repositories {
     mavenCentral()
@@ -18,7 +19,10 @@ repositories {
 
 // Compile against the oldest supported API so nothing newer than 1.21.4 sneaks in;
 // 26.x compatibility is covered by the e2e suite.
-val paperApi = "io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT"
+// -PpaperApi=26.2.build.128-stable checks the sources against a newer API (needs Java 25).
+val paperApiVersion = providers.gradleProperty("paperApi").getOrElse("1.21.4-R0.1-SNAPSHOT")
+val paperApi = "io.papermc.paper:paper-api:$paperApiVersion"
+val javaRelease = if (paperApiVersion.startsWith("1.")) 21 else 25
 
 dependencies {
     compileOnly(paperApi)
@@ -32,17 +36,17 @@ dependencies {
 }
 
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    toolchain.languageVersion = JavaLanguageVersion.of(javaRelease)
 }
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    options.release = 21
+    options.release = javaRelease
     options.compilerArgs.add("-Xlint:all,-processing,-serial")
 }
 
 tasks.processResources {
-    val props = mapOf("version" to project.version)
+    val props = mapOf("version" to project.version, "description" to project.description)
     inputs.properties(props)
     filesMatching("plugin.yml") { expand(props) }
 }

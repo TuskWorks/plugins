@@ -34,7 +34,7 @@ tasks {
     compileJava {
         options.encoding = "UTF-8"
         options.release = javaRelease
-        options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-Xlint:removal"))
+        options.compilerArgs.add("-Xlint:all,-processing,-serial")
     }
 
     processResources {

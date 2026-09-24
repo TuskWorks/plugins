@@ -46,6 +46,21 @@ jobs:
           path: e2e/fixtures/test-economy/build/libs/*.jar
           if-no-files-found: error
 
+  # The jar targets the 1.21.4 API; make sure the sources still compile against the newest API.
+  api-compat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: |
+            25
+            21
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Compile against Paper API 26.2
+        run: ./gradlew :tuskclans:compileJava -PpaperApi=26.2.build.128-stable
+
   e2e:
     needs: build
     runs-on: ubuntu-latest

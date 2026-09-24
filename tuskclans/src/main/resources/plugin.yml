@@ -3,7 +3,7 @@ version: '${version}'
 main: io.github.tuskworks.clans.TuskClans
 api-version: '1.21'
 folia-supported: true
-description: Lightweight clans & teams for SMP servers — chat, friendly fire, alliances, clan homes.
+description: '${description}'
 author: TuskWorks
 website: https://github.com/TuskWorks/plugins
 softdepend: [PlaceholderAPI, Vault]
