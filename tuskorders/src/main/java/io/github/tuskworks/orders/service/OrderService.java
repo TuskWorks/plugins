@@ -8,10 +8,12 @@ import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -30,6 +32,13 @@ public final class OrderService {
     private final Map<Integer, Order> orders = new ConcurrentHashMap<>();
     /** Delivered items whose payout hasn't cleared yet; they can't be collected until it does. */
     private final Map<Integer, Integer> inFlight = new HashMap<>();
+    /** Orders being cancelled or expired whose refund hasn't cleared yet; they may still reopen. */
+    private final Set<Integer> closing = new HashSet<>();
+    /**
+     * Money for deliveries rolled back while their order was {@link #closing}. Owed to the owner
+     * only if the close goes through; if it fails, the reopened order holds it in escrow again.
+     */
+    private final Map<Integer, Long> heldRefunds = new HashMap<>();
     private final Object lock = new Object();
     private final OrderStorage storage;
     private final Bank bank;
@@ -239,9 +248,16 @@ public final class OrderService {
                 current.createdAt(), current.expiresAt(),
                 current.status() == OrderStatus.COMPLETED ? OrderStatus.ACTIVE : current.status());
         put(reverted);
-        if (!reverted.active()) {
-            // Cancelled or expired meanwhile: that refund didn't cover these items
-            refund(reverted.owner(), accepted * priceEach, "rolled back delivery on closed order #" + orderId);
+        if (reverted.active()) {
+            return;
+        }
+        // Cancelled or expired meanwhile: that refund didn't cover these items
+        long owed = accepted * priceEach;
+        if (closing.contains(orderId)) {
+            // Its refund is still running; if it fails the order reopens with these items in escrow
+            heldRefunds.merge(orderId, owed, Long::sum);
+        } else {
+            refund(reverted.owner(), owed, "rolled back delivery on closed order #" + orderId);
             archiveIfDone(orderId);
         }
     }
@@ -261,11 +277,16 @@ public final class OrderService {
                 return Outcome.fail("cancel.not-active");
             }
             put(before.withStatus(OrderStatus.CANCELLED));
+            closing.add(orderId);
         }
         long refund = before.escrow();
-        if (!bank.deposit(before.owner(), refund)) {
-            reopen(orderId, OrderStatus.CANCELLED);
+        boolean refunded = bank.deposit(before.owner(), refund);
+        long owed = finishClose(orderId, OrderStatus.CANCELLED, refunded);
+        if (!refunded) {
             return Outcome.fail("cancel.refund-failed");
+        }
+        if (owed > 0 && refund(before.owner(), owed, "delivery rolled back while order #" + orderId + " closed")) {
+            refund += owed;
         }
         synchronized (lock) {
             archiveIfDone(orderId);
@@ -313,16 +334,21 @@ public final class OrderService {
                     continue;
                 }
                 put(before.withStatus(OrderStatus.EXPIRED));
+                closing.add(before.id());
             }
-            if (bank.deposit(before.owner(), before.escrow())) {
-                synchronized (lock) {
-                    expired.add(orders.getOrDefault(before.id(), before.withStatus(OrderStatus.EXPIRED)));
-                    archiveIfDone(before.id());
-                }
-            } else {
-                // Leave it open and try again on the next sweep
-                reopen(before.id(), OrderStatus.EXPIRED);
+            boolean refunded = bank.deposit(before.owner(), before.escrow());
+            // A failed refund reopens the order, so the next sweep tries again
+            long owed = finishClose(before.id(), OrderStatus.EXPIRED, refunded);
+            if (!refunded) {
                 logger.warning("Could not refund expiring order #" + before.id() + "; will retry");
+                continue;
+            }
+            if (owed > 0) {
+                refund(before.owner(), owed, "delivery rolled back while order #" + before.id() + " expired");
+            }
+            synchronized (lock) {
+                expired.add(orders.getOrDefault(before.id(), before.withStatus(OrderStatus.EXPIRED)));
+                archiveIfDone(before.id());
             }
         }
         return expired;
@@ -339,21 +365,36 @@ public final class OrderService {
         }
     }
 
-    private void reopen(int orderId, OrderStatus expected) {
+    /**
+     * Ends a cancel or expiry once its refund has an outcome. A failed refund reopens the order.
+     *
+     * @return money for deliveries rolled back meanwhile that the owner is now owed (0 if it reopened,
+     *         since the reopened order holds those items in escrow again)
+     */
+    private long finishClose(int orderId, OrderStatus closedAs, boolean refunded) {
         synchronized (lock) {
+            closing.remove(orderId);
+            Long held = heldRefunds.remove(orderId);
+            if (refunded) {
+                return held == null ? 0 : held;
+            }
             Order current = orders.get(orderId);
-            if (current != null && current.status() == expected) {
-                // Deliveries were blocked while it was closed, so the escrow is unchanged
+            if (current != null && current.status() == closedAs) {
+                // Deliveries were blocked while it was closed; rollbacks put their items back in escrow
                 put(current.withStatus(OrderStatus.ACTIVE));
             }
+            return 0;
         }
     }
 
-    private void refund(UUID player, long cents, String reason) {
-        if (!bank.deposit(player, cents)) {
-            logger.severe("Failed to refund " + money.format(cents) + " to " + player + " (" + reason
-                    + "); please compensate manually");
+    /** @return false if the economy rejected it (logged for manual compensation) */
+    private boolean refund(UUID player, long cents, String reason) {
+        if (bank.deposit(player, cents)) {
+            return true;
         }
+        logger.severe("Failed to refund " + money.format(cents) + " to " + player + " (" + reason
+                + "); please compensate manually");
+        return false;
     }
 
     /** Must hold {@link #lock}. */
@@ -362,10 +403,13 @@ public final class OrderService {
         storage.save(order);
     }
 
-    /** Must hold {@link #lock}. Deletes a finished order once nothing is left in it. */
+    /**
+     * Must hold {@link #lock}. Deletes a finished order once nothing is left in it. Never while its
+     * cancel or expiry refund is pending: a failed refund must find the order to reopen it.
+     */
     private void archiveIfDone(int orderId) {
         Order order = orders.get(orderId);
-        if (order != null && order.archivable() && !inFlight.containsKey(orderId)) {
+        if (order != null && order.archivable() && !inFlight.containsKey(orderId) && !closing.contains(orderId)) {
             orders.remove(orderId);
             storage.delete(orderId);
         }

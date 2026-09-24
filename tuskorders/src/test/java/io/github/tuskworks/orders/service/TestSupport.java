@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiPredicate;
 
 final class TestSupport {
 
@@ -18,9 +20,11 @@ final class TestSupport {
     }
 
     static final class FakeBank implements Bank {
-        final Map<UUID, Long> balances = new HashMap<>();
+        final Map<UUID, Long> balances = new ConcurrentHashMap<>();
         boolean failDeposits;
         Runnable beforeDeposit = () -> { };
+        /** Decides each deposit; may block to force an interleaving between threads. */
+        volatile BiPredicate<UUID, Long> depositRule = (player, cents) -> true;
 
         long balance(UUID player) {
             return balances.getOrDefault(player, 0L);
@@ -42,7 +46,7 @@ final class TestSupport {
         @Override
         public boolean deposit(UUID player, long cents) {
             beforeDeposit.run();
-            if (failDeposits) {
+            if (failDeposits || !depositRule.test(player, cents)) {
                 return false;
             }
             balances.merge(player, cents, Long::sum);

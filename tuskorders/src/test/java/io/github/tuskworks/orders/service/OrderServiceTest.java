@@ -11,8 +11,11 @@ import io.github.tuskworks.orders.service.TestSupport.FakeBank;
 import io.github.tuskworks.orders.service.TestSupport.MemoryStorage;
 import io.github.tuskworks.orders.service.TestSupport.MutableClock;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -244,6 +247,141 @@ class OrderServiceTest {
         assertEquals(OrderStatus.EXPIRED, expired.getFirst().status());
         assertEquals(100_000_00 - 2 * 50_00, bank.balance(BUYER));
         assertEquals(2, service.get(id).orElseThrow().uncollected());
+    }
+
+    // ---- a failed payout rolled back while the order is being closed ----------------------------
+
+    /**
+     * Replays this interleaving: a delivery is recorded and its payout starts, the buyer closes
+     * the order (cancel or expiry), the payout fails and the delivery is rolled back, and only then
+     * does the close's refund finish, succeeding or failing as given.
+     */
+    private void closeDuringFailedPayout(int id, int offered, boolean closeRefundSucceeds, Runnable close)
+            throws InterruptedException {
+        CountDownLatch payoutStarted = new CountDownLatch(1);
+        CountDownLatch closeMarked = new CountDownLatch(1);
+        CountDownLatch rollbackDone = new CountDownLatch(1);
+        bank.depositRule = (player, cents) -> {
+            if (player.equals(SELLER)) {
+                payoutStarted.countDown();
+                await(closeMarked);
+                return false; // the payout fails once the close is under way
+            }
+            if (Thread.currentThread().getName().equals("closer")) {
+                closeMarked.countDown();
+                await(rollbackDone);
+                return closeRefundSucceeds;
+            }
+            return true;
+        };
+        Thread deliverer = new Thread(() -> {
+            assertEquals(0, service.deliver(id, SELLER, offered).accepted());
+            rollbackDone.countDown();
+        }, "deliverer");
+        Thread closer = new Thread(() -> {
+            await(payoutStarted);
+            close.run();
+        }, "closer");
+        deliverer.start();
+        closer.start();
+        deliverer.join(5_000);
+        closer.join(5_000);
+        assertFalse(deliverer.isAlive() || closer.isAlive(), "interleaving got stuck");
+        bank.depositRule = (player, cents) -> true;
+    }
+
+    private static void await(CountDownLatch latch) {
+        try {
+            if (!latch.await(5, TimeUnit.SECONDS)) {
+                throw new AssertionError("interleaving timed out");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError(e);
+        }
+    }
+
+    @Test
+    void rollbackDuringFailedCancelRefundCreatesNoMoney() throws InterruptedException {
+        int id = createDiamonds(100, 10_00);
+        service.deliver(id, SELLER, 10); // paid for and waiting to be collected
+        Outcome[] cancel = new Outcome[1];
+
+        closeDuringFailedPayout(id, 64, false, () -> cancel[0] = service.cancel(id, BUYER, false));
+
+        assertEquals("cancel.refund-failed", cancel[0].key());
+        Order order = service.get(id).orElseThrow();
+        assertEquals(OrderStatus.ACTIVE, order.status());
+        assertEquals(10, order.delivered());
+        // Nothing was refunded, so the full unfilled part is still in escrow and nowhere else
+        assertEquals(100_000_00 - 100 * 10_00, bank.balance(BUYER));
+        assertEquals(90 * 10_00, order.escrow());
+
+        assertTrue(service.cancel(id, BUYER, false).success());
+        assertEquals(100_000_00 - 10 * 10_00, bank.balance(BUYER), "buyer pays exactly for the 10 delivered");
+        assertEquals(10 * 10_00, bank.balance(SELLER));
+    }
+
+    @Test
+    void rollbackDuringFailedCancelRefundKeepsTheOrder() throws InterruptedException {
+        int id = createDiamonds(100, 10_00);
+        Outcome[] cancel = new Outcome[1];
+
+        closeDuringFailedPayout(id, 64, false, () -> cancel[0] = service.cancel(id, BUYER, false));
+
+        assertEquals("cancel.refund-failed", cancel[0].key());
+        Order order = service.get(id).orElseThrow(); // must not be archived while its refund was pending
+        assertEquals(OrderStatus.ACTIVE, order.status());
+        assertEquals(100 * 10_00, order.escrow());
+        assertEquals(100_000_00 - 100 * 10_00, bank.balance(BUYER));
+        assertEquals(order, storage.saved.get(id));
+    }
+
+    @Test
+    void rollbackDuringSuccessfulCancelRefundsEverything() throws InterruptedException {
+        int id = createDiamonds(100, 10_00);
+        Outcome[] cancel = new Outcome[1];
+
+        closeDuringFailedPayout(id, 64, true, () -> cancel[0] = service.cancel(id, BUYER, false));
+
+        assertTrue(cancel[0].success());
+        assertEquals(100_000_00, bank.balance(BUYER), "the 36 refunded by the cancel plus the 64 rolled back");
+        assertTrue(service.get(id).isEmpty(), "nothing left to collect, so the order is archived");
+        assertFalse(storage.saved.containsKey(id));
+    }
+
+    @Test
+    void rollbackDuringFailedExpiryRefundCreatesNoMoney() throws InterruptedException {
+        int id = createDiamonds(100, 10_00);
+        service.deliver(id, SELLER, 10);
+        clock.advance(Duration.ofDays(7));
+        List<List<Order>> expired = new ArrayList<>();
+
+        closeDuringFailedPayout(id, 64, false, () -> expired.add(service.expireOverdue()));
+
+        assertTrue(expired.getFirst().isEmpty());
+        Order order = service.get(id).orElseThrow();
+        assertEquals(OrderStatus.ACTIVE, order.status(), "left open for the next sweep");
+        assertEquals(90 * 10_00, order.escrow());
+        assertEquals(100_000_00 - 100 * 10_00, bank.balance(BUYER));
+
+        assertEquals(1, service.expireOverdue().size());
+        assertEquals(100_000_00 - 10 * 10_00, bank.balance(BUYER));
+    }
+
+    @Test
+    void collectingWhileACancelRefundIsPendingKeepsTheOrder() {
+        int id = createDiamonds(10, 50_00);
+        service.deliver(id, SELLER, 4);
+        bank.beforeDeposit = () -> service.collect(id, BUYER, 100); // empties it mid-refund
+        bank.failDeposits = true;
+
+        Outcome outcome = service.cancel(id, BUYER, false);
+
+        assertEquals("cancel.refund-failed", outcome.key());
+        Order order = service.get(id).orElseThrow();
+        assertEquals(OrderStatus.ACTIVE, order.status());
+        assertEquals(6 * 50_00, order.escrow());
     }
 
     @Test
