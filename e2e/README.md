@@ -1,16 +1,28 @@
 # E2E tests
 
 Real Minecraft clients ([mineflayer](https://github.com/PrismarineJS/mineflayer)) against a throwaway
-headless Paper server.
+headless Paper or Folia server, shared by every plugin in this repo.
 
 ```bash
-./gradlew :tuskclans:build        # from the repo root
+./gradlew build                   # from the repo root: all plugins plus the test economy
 cd e2e
 npm install
-node run.js --mc 26.1.2           # or 1.21.11, 26.3 …
+node run.js --scenario tuskcrates --mc 26.1.2     # or 1.21.4, 1.21.11, 26.3 …
 node run.js --scenario tuskclans-extra --server folia --mc 1.21.11
-E2E_VERBOSE=1 node run.js --mc 26.3   # stream server + bot output
+E2E_VERBOSE=1 node run.js --scenario tuskorders --mc 26.3   # stream server + bot output
 ```
+
+| Scenario | Plugin | Covers |
+|---|---|---|
+| `tuskclans` (default) | TuskClans | clan lifecycle, chat channels, friendly fire, alliances, homes, restart |
+| `tuskclans-extra` | TuskClans | invites and open clans, kicks, transfer, limits, expiry, arrows, stats, Vault cost, zh_TW |
+| `tuskcrates` | TuskCrates | crate blocks, holograms, every key type and animation, previews, `/crates`, keyall |
+| `tuskcrates-extra` | TuskCrates | broken crate files, command rewards, permissions, explosions, pistons, crafting, autosave, restart |
+| `tuskorders` | TuskOrders | placing, delivering, collecting and cancelling orders with money checked at every step |
+| `tuskorders-extra` | TuskOrders | limits, fees and taxes, expiry refunds, damaged items, logout or server stop mid-delivery |
+
+`fixtures/test-economy` is an in-memory economy named Vault (Gradle project `:e2e-test-economy`); scenarios
+that need money install it instead of a real economy plugin.
 
 What the runner does:
 

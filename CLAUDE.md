@@ -23,18 +23,23 @@ TuskWorks 的 Minecraft server plugin monorepo（GitHub: `TuskWorks/plugins`，p
 
 ## 環境
 - JDK 21（Temurin，系統安裝）：用來跑 Gradle 和 1.21.x server
-- JDK 25：只有跑 26.x server 需要。e2e harness 會自動下載 Temurin 25 到 `e2e/.jdks/`，CI 則由 setup-java 安裝，不必手動裝（編譯只用 JDK 21 toolchain）
+- JDK 25：跑 26.x server 時需要。e2e harness 依序找 `E2E_JAVA_25`、`JAVA_HOME_25_X64`（setup-java 設的），都沒有就下載 Temurin 25 到 `e2e/.jdks/`。另外 TuskCrates 對新版 API 做相容性編譯（`-PpaperApi=26.2.build.128-stable`）時，由 Gradle toolchain（foojay）自動下載。平常編譯只用 JDK 21
 - Gradle 9.x wrapper（`./gradlew`）、gh CLI、Node（mineflayer 測試用）
 - Git Bash 的 PATH 可能沒有 `java`、`gh`，必要時用完整路徑（`C:\Program Files\GitHub CLI\gh.exe`）
 
 ## 結構
-- `tuskclans/`：TuskClans（Teams/Clans plugin，第一個作品）
-- `e2e/`：headless Paper + mineflayer 的端對端測試；server jar 會快取在 `e2e/.servers/`（已 gitignore）
+- `tuskclans/`：TuskClans（Teams/Clans）
+- `tuskcrates/`：TuskCrates（crates，虛擬／實體鑰匙、三種開箱動畫、hologram）
+- `tuskorders/`：TuskOrders（SMP-style 收購單市場，需要 Vault）
+- `e2e/`：三個 plugin 共用的 headless Paper／Folia + mineflayer 端對端測試
+  - `scenarios/<plugin>.js` 測主要流程，`scenarios/<plugin>-extra.js` 測邊界情況、上限、設定變更和重啟；`--scenario <name>` 會自動載入對應的檔案
+  - `fixtures/test-economy`：名為 Vault 的 in-memory 經濟插件（Gradle project `:e2e-test-economy`），只給測試用、不發布
+  - server jar 快取在 `e2e/.servers/`、測試伺服器在 `e2e/.run/`（都已 gitignore）
 - mineflayer 最高支援 26.1。26.2 以上的 server 只跑 console smoke test（確認 plugin 能啟用、指令正常、log 沒有錯誤）
 - `--via` 會改用 ViaVersion + ViaBackwards 讓 bot 連線，但目前在 26.2+ 會被踢（`Invalid move player packet`，屬於上游的封包轉換問題）
 
 ## 常用指令
-- Build 加 unit test：`./gradlew build`
-- E2E：`cd e2e && npm install && node run.js --mc 26.1.2`（其他版本：`1.21.11`、`26.3`；加上 `E2E_VERBOSE=1` 可以看完整輸出）
-- E2E 測 Folia：`node run.js --server folia --mc 1.21.11`
-- CI：`.github/workflows/tuskclans.yml` 會跑 build、unit test，以及 e2e 矩陣（Paper 1.21.11／26.1.2／26.3 smoke、Folia 1.21.11）
+- Build 加 unit test：`./gradlew build`（三個 plugin 加上 test economy）
+- E2E：`cd e2e && npm install && node run.js --scenario tuskcrates --mc 26.1.2`（scenario：`tuskclans`、`tuskcrates`、`tuskorders`，以及各自的 `-extra`；版本：`1.21.4`、`1.21.11`、`26.1.2`、`26.3`；加上 `E2E_VERBOSE=1` 可以看完整輸出）
+- E2E 測 Folia：`node run.js --scenario tuskorders --server folia --mc 1.21.11`
+- CI：`.github/workflows/tusk{clans,crates,orders}.yml`，各自跑 build、unit test，以及 e2e 矩陣（主要流程：Paper 1.21.4／1.21.11／26.1.2／26.3 smoke、Folia 1.21.11／26.1.2；延伸測試：Paper 26.1.2、Folia 1.21.11）。TuskCrates 另外對 Paper API 26.2 做相容性編譯

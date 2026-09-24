@@ -38,7 +38,8 @@ Open orders per player default to 5; grant `tuskorders.limit.<number>` or `tusko
 ## Development
 
 ```bash
-./gradlew :tuskorders:build
+./gradlew :tuskorders:build :e2e-test-economy:build
+cd e2e && npm install && node run.js --scenario tuskorders --mc 26.1.2
 ```
 
 End-to-end: `e2e/scenarios/tuskorders.js` drives two real clients through the main flows against a headless server, and `tuskorders-extra.js` covers the edge cases: limits, fees and taxes, admin cancel, expiry refunds, damaged items, and logging out or a server stop with items still in the delivery menu. `e2e/fixtures/test-economy` stands in for Vault.
