@@ -8,6 +8,7 @@ headless Paper server.
 cd e2e
 npm install
 node run.js --mc 26.1.2           # or 1.21.11, 26.3 …
+node run.js --scenario tuskclans-extra --server folia --mc 1.21.11
 E2E_VERBOSE=1 node run.js --mc 26.3   # stream server + bot output
 ```
 
@@ -20,7 +21,15 @@ What the runner does:
    `smoke()` instead. `--via` bridges the bots through ViaVersion + ViaBackwards from Modrinth, but on 26.2+
    they currently get kicked with "Invalid move player packet" (an upstream translation issue).
 4. Starts the server in `.run/<scenario>-<version>/` (offline mode, flat world, no mobs) and runs the scenario.
-5. Fails if any step fails or the server log contains an error mentioning the plugin.
+   Natural mob spawning is switched off by game rule (`doMobSpawning` up to 1.21.10, `spawn_mobs` from 1.21.11):
+   from 1.21.11 `spawn-monsters` in server.properties no longer applies, and superflat slimes would otherwise
+   kill bots in longer scenarios.
+5. Fails if any step fails or the server log contains a warning or error from the plugin.
 
-Scenarios live in `scenarios/`; each exports `plugins()` (jars to install), `run({ server, join, step })`
-for bot tests and `smoke({ server, step })` for console-only checks.
+Scenarios live in `scenarios/` and `--scenario <name>` loads `scenarios/<name>.js`. Each exports
+`plugins()` (jars to install), `run({ server, join, step })` for bot tests and `smoke({ server, step })`
+for console-only checks, plus `logName`/`packagePrefix` (whose log lines count as errors) and optionally
+`expectedLog` (regexes for warnings the scenario provokes on purpose). Shared helpers are in
+`lib/helpers.js`; `helpers.skip(reason)` marks a step as skipped instead of failed.
+
+`<plugin>` covers the main flows; `<plugin>-extra` covers edge cases, limits, config changes and restarts.

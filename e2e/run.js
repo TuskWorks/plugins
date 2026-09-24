@@ -6,6 +6,7 @@
 // bridges bots through ViaVersion + ViaBackwards (currently kicked on 26.2+ with
 // "Invalid move player packet", an upstream translation issue).
 
+const fs = require('node:fs')
 const path = require('node:path')
 const { parseArgs } = require('node:util')
 const mineflayer = require('mineflayer')
@@ -14,8 +15,14 @@ const downloads = require('./lib/downloads')
 const { PaperServer } = require('./lib/server')
 const { TestBot } = require('./lib/bots')
 
-const SCENARIOS = {
-  tuskclans: () => require('./scenarios/tuskclans')
+/** scenarios/<name>.js; adding a file is all it takes to add a scenario. */
+function loadScenario (name) {
+  const file = path.join(__dirname, 'scenarios', `${name}.js`)
+  if (!/^[\w-]+$/.test(name) || !fs.existsSync(file)) {
+    const known = fs.readdirSync(path.join(__dirname, 'scenarios')).map(f => f.replace(/\.js$/, ''))
+    throw new Error(`Unknown scenario ${name} (have: ${known.join(', ')})`)
+  }
+  return require(file)
 }
 
 async function main () {
@@ -28,8 +35,7 @@ async function main () {
       via: { type: 'boolean', default: false }
     }
   })
-  const scenario = SCENARIOS[values.scenario]?.()
-  if (!scenario) throw new Error(`Unknown scenario ${values.scenario}`)
+  const scenario = loadScenario(values.scenario)
 
   const mc = values.mc
   const port = Number(values.port)
@@ -75,6 +81,10 @@ async function main () {
       await fn()
       console.log(`  ✔ ${name} (${Date.now() - started}ms)`)
     } catch (e) {
+      if (e.skip) {
+        console.log(`  - ${name} (skipped: ${e.message})`)
+        return
+      }
       failures++
       console.log(`  ✘ ${name}\n    ${String(e.stack ?? e).split('\n').join('\n    ')}`)
     }
@@ -97,7 +107,10 @@ async function main () {
     await server.stop()
   }
 
-  const errors = server.errorsFrom('TuskClans', 'io.github.tuskworks')
+  // Warnings a scenario provokes on purpose (e.g. broken config files) are not failures.
+  const expected = scenario.expectedLog ?? []
+  const errors = server.errorsFrom(scenario.logName ?? 'TuskClans', scenario.packagePrefix ?? 'io.github.tuskworks')
+    .filter(entry => !expected.some(re => re.test(entry)))
   if (errors.length > 0) {
     failures++
     console.log(`  ✘ server log has ${errors.length} error(s) from the plugin:\n${errors.join('\n---\n')}`)

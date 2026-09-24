@@ -33,6 +33,8 @@ async function healthAfterHit (attacker, victim, server) {
 
 module.exports = {
   name: 'tuskclans',
+  logName: 'TuskClans',
+  packagePrefix: 'io.github.tuskworks.clans',
   plugins: () => [pluginJar()],
 
   /** Console-only checks for server versions the bots can't join yet. */
