@@ -11,7 +11,7 @@ A modern crates plugin for **Paper and Folia**, from **1.21.4 up to 26.x**. One 
 
 ## Installation
 
-1. Drop `TuskCrates-<version>.jar` into `plugins/`.
+1. Drop `TuskCrates-<version>.jar` into `plugins/`. No dependencies.
 2. Start the server. Three example crates are created in `plugins/TuskCrates/crates/`: `common`, `rare` and `legendary`.
 3. Look at a block (a chest works well) and run `/tc set common`.
 4. Give yourself a key: `/tc give <you> common 1`.
@@ -87,24 +87,8 @@ These item keys are supported: `material`, `amount`, `name`, `lore`, `enchantmen
 
 | Server | Supported | Tested on real servers |
 |---|---|---|
-| Paper | 1.21.4 – 26.3 | 1.21.4, 1.21.11, 26.1.2 (bot) · 26.3 (console) |
-| Folia | 1.21.4 – 26.x | 1.21.11, 26.1.2 (bot) |
-
-The sources are also compiled against the Paper 26.2 API on every change. The bot tests place crates, open them with each key type and animation, close menus early, disconnect mid-animation and check what ends up on disk.
-
-## Building
-
-```bash
-./gradlew :tuskcrates:build
-```
-
-The jar ends up in `tuskcrates/build/libs/`. The end-to-end tests use the shared harness in [`../e2e`](../e2e):
-
-```bash
-cd e2e && npm install && node run.js --scenario tuskcrates --mc 1.21.11
-```
-
-Other options: `--mc 26.1.2`, `--server folia`, `--mc 26.3` (console only), and `--scenario tuskcrates-extra` for the edge cases (broken crate files, explosions, pistons, crafting, autosave, restarts and more).
+| Paper | 1.21.4 – 26.3 | 1.21.4, 1.21.11, 26.1.2 (real clients) · 26.3 (console) |
+| Folia | 1.21.4 – 26.x | 1.21.11, 26.1.2 (real clients) |
 
 ## AI disclosure
 
@@ -112,6 +96,9 @@ TuskCrates is written primarily by AI (Claude by Anthropic) under the direction 
 tests and documentation are AI-generated. Every release has to pass unit tests and end-to-end tests
 with real Minecraft clients on Paper and Folia before it is published.
 
-## License
+## Source, issues and license
 
-TuskCrates is licensed under the GNU General Public License v3.0 only (GPL-3.0-only). See [`LICENSE`](../LICENSE).
+Source code: [github.com/TuskWorks/plugins](https://github.com/TuskWorks/plugins/tree/main/tuskcrates) ·
+Bug reports: [GitHub issues](https://github.com/TuskWorks/plugins/issues)
+
+Licensed under the GNU General Public License v3.0 only (GPL-3.0-only).

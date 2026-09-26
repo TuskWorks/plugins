@@ -1,6 +1,7 @@
 # TuskOrders
 
-SMP-style buy orders for Paper. Players post what they want to buy and how much they pay per item; anyone can deliver through a chest menu and gets paid instantly.
+SMP-style buy orders for Paper and Folia. Players post what they want to buy and how much they pay per item;
+anyone can deliver through a chest menu and gets paid instantly.
 
 - **Escrow**: the full order value is taken when the order is placed, so every delivery is paid, even if the buyer is offline
 - **Chest-menu delivery**: open an order, drop items in, close. Matching items are paid for, everything else comes back
@@ -11,7 +12,9 @@ SMP-style buy orders for Paper. Players post what they want to buy and how much 
 - **Folia-ready**, one jar for Paper 1.21.4 through 26.x
 - English and 繁體中文 messages, item names shown in each player's own game language
 
-Requires [Vault](https://www.spigotmc.org/resources/vault.34315/) and an economy plugin (EssentialsX, CMI, …).
+## Requirements
+
+[Vault](https://www.spigotmc.org/resources/vault.34315/) and an economy plugin (EssentialsX, CMI, …).
 
 ## Commands
 
@@ -28,21 +31,21 @@ Prices accept shorthand such as `2.50`, `1.5k` or `2m`. `hand` picks the item yo
 
 Open orders per player default to 5; grant `tuskorders.limit.<number>` or `tuskorders.limit.unlimited` for more.
 
-## Config highlights
+## Configuration
+
+See [`config.yml`](https://github.com/TuskWorks/plugins/blob/main/tuskorders/src/main/resources/config.yml). Highlights:
 
 - `orders.expire-after-days`: unfilled orders close and refund after this long (0 = never)
 - `orders.creation-fee-percent` / `orders.delivery-tax-percent`: optional money sinks
 - `orders.min-price-each` / `orders.max-price-each` / `orders.max-amount`
 - `blacklist`: items that can't be ordered, with `*` wildcards (spawn eggs, spawners and creative-only items by default)
 
-## Development
+## Compatibility
 
-```bash
-./gradlew :tuskorders:build :e2e-test-economy:build
-cd e2e && npm install && node run.js --scenario tuskorders --mc 26.1.2
-```
-
-End-to-end: `e2e/scenarios/tuskorders.js` drives two real clients through the main flows against a headless server, and `tuskorders-extra.js` covers the edge cases: limits, fees and taxes, admin cancel, expiry refunds, damaged items, and logging out or a server stop with items still in the delivery menu. `e2e/fixtures/test-economy` stands in for Vault.
+| Server | Supported | Tested on real servers |
+|---|---|---|
+| Paper | 1.21.4 – 26.3 | 1.21.4, 1.21.11, 26.1.2 (real clients) · 26.3 (console) |
+| Folia | 1.21.4 – 26.x | 1.21.11, 26.1.2 (real clients) |
 
 ## AI disclosure
 
@@ -50,6 +53,9 @@ TuskOrders is written primarily by AI (Claude by Anthropic) under the direction 
 tests and documentation are AI-generated. Every release has to pass unit tests and end-to-end tests
 with real Minecraft clients on Paper and Folia before it is published.
 
-## License
+## Source, issues and license
 
-TuskOrders is licensed under the GNU General Public License v3.0 only (GPL-3.0-only). See [`LICENSE`](../LICENSE).
+Source code: [github.com/TuskWorks/plugins](https://github.com/TuskWorks/plugins/tree/main/tuskorders) ·
+Bug reports: [GitHub issues](https://github.com/TuskWorks/plugins/issues)
+
+Licensed under the GNU General Public License v3.0 only (GPL-3.0-only).

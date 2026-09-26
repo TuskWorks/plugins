@@ -3,9 +3,9 @@
 Lightweight clans & teams for SMP servers — clan chat, friendly-fire protection, alliances,
 clan homes and a kill leaderboard. Built for **Paper 1.21.4 – 26.x** and **Folia**.
 
-- No dependencies — PlaceholderAPI and Vault are optional
+- No required dependencies — PlaceholderAPI and Vault are optional
 - Folia-safe schedulers throughout
-- Clean MiniMessage messages, English and 繁體中文 included
+- MiniMessage messages, English and 繁體中文 included
 - Data stored as plain JSON (one file per clan), written off the main thread
 
 ## Features
@@ -67,25 +67,26 @@ Using a chat or tab plugin? Set `chat.show-tag: false` and put `%tuskclans_tag_f
 
 ## Configuration
 
-See [`config.yml`](src/main/resources/config.yml). Highlights: tag length and pattern, member and
-ally limits, creation cost (Vault), home warmup/cooldown, worlds where homes and protection are off.
-Messages live in `plugins/TuskClans/lang/`; pick one with `language:`.
+See [`config.yml`](https://github.com/TuskWorks/plugins/blob/main/tuskclans/src/main/resources/config.yml).
+Highlights: tag length and pattern, member and ally limits, creation cost (Vault), home warmup/cooldown,
+worlds where homes and protection are off. Messages live in `plugins/TuskClans/lang/`; pick one with `language:`.
 
-## Building
+## Compatibility
 
-```bash
-./gradlew :tuskclans:build
-```
-
-The jar lands in `tuskclans/build/libs/`. End-to-end tests with real clients live in [`../e2e`](../e2e).
+| Server | Supported | Tested on real servers |
+|---|---|---|
+| Paper | 1.21.4 – 26.3 | 1.21.4, 1.21.11, 26.1.2 (real clients) · 26.3 (console) |
+| Folia | 1.21.4 – 26.x | 1.21.11, 26.1.2 (real clients) |
 
 ## AI disclosure
 
 TuskClans is written primarily by AI (Claude by Anthropic) under the direction of TuskWorks: the code,
-tests and documentation are AI-generated. Every release has to pass unit tests, end-to-end tests with
-real Minecraft clients on Paper 1.21.4, 1.21.11 and 26.1.2 and on Folia 1.21.11 and 26.1.2, a server
-smoke test on Paper 26.3, and a compile check against the Paper 26.2 API before it is published.
+tests and documentation are AI-generated. Every release has to pass unit tests and end-to-end tests
+with real Minecraft clients on Paper and Folia before it is published.
 
-## License
+## Source, issues and license
 
-TuskClans is licensed under the GNU General Public License v3.0 only (GPL-3.0-only). See [`LICENSE`](../LICENSE).
+Source code: [github.com/TuskWorks/plugins](https://github.com/TuskWorks/plugins/tree/main/tuskclans) ·
+Bug reports: [GitHub issues](https://github.com/TuskWorks/plugins/issues)
+
+Licensed under the GNU General Public License v3.0 only (GPL-3.0-only).
