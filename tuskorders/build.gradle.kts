@@ -1,6 +1,7 @@
 plugins {
     java
     id("xyz.jpenilla.run-paper") version "3.1.0"
+    id("io.papermc.hangar-publish-plugin")
 }
 
 group = "io.github.tuskworks"
@@ -71,5 +72,25 @@ tasks {
         }
         runDirectory = layout.projectDirectory.dir("run/$mc")
         jvmArgs("-Dcom.mojang.eula.agree=true")
+    }
+}
+
+// Uploaded by .github/workflows/release.yml when a tuskorders-v<version> tag is pushed
+hangarPublish {
+    publications.register("plugin") {
+        version = project.version as String
+        id = "TuskOrders"
+        channel = "Release"
+        changelog = providers.environmentVariable("HANGAR_CHANGELOG")
+        apiKey = providers.environmentVariable("HANGAR_API_TOKEN")
+        platforms {
+            paper {
+                jar = tasks.jar.flatMap { it.archiveFile }
+                platformVersions = providers.gradleProperty("hangarPaperVersions").map { it.split(",") }
+                dependencies {
+                    url("Vault", "https://www.spigotmc.org/resources/vault.34315/") { required = true }
+                }
+            }
+        }
     }
 }

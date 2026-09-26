@@ -1,0 +1,126 @@
+name: Release
+
+# Pushing a tag such as tuskclans-v0.1.0 publishes that plugin version to Hangar and GitHub Releases.
+# Every release is an outward publication: only push a tag after Tony has confirmed it.
+on:
+  push:
+    tags:
+      - 'tuskclans-v*'
+      - 'tuskcrates-v*'
+      - 'tuskorders-v*'
+
+permissions:
+  contents: read
+
+concurrency: release-${{ github.ref_name }}
+
+jobs:
+  # Fail fast (before the e2e matrix) when the tag, version, changelog or Hangar project don't line up
+  meta:
+    runs-on: ubuntu-latest
+    outputs:
+      module: ${{ steps.check.outputs.module }}
+      project: ${{ steps.check.outputs.project }}
+      version: ${{ steps.check.outputs.version }}
+      notes: ${{ steps.check.outputs.notes }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: check
+        run: |
+          module="${GITHUB_REF_NAME%%-v*}"
+          version="${GITHUB_REF_NAME#*-v}"
+          case "$module" in
+            tuskclans) project=TuskClans ;;
+            tuskcrates) project=TuskCrates ;;
+            tuskorders) project=TuskOrders ;;
+            *) echo "::error::Unknown plugin in tag $GITHUB_REF_NAME"; exit 1 ;;
+          esac
+
+          declared=$(sed -n 's/^version = "\(.*\)"$/\1/p' "$module/build.gradle.kts")
+          if [ "$declared" != "$version" ]; then
+            echo "::error::Tag says $version but $module/build.gradle.kts says $declared"; exit 1
+          fi
+
+          header=$(grep -m1 "^## $version " "$module/CHANGELOG.md" || true)
+          case "$header" in
+            '') echo "::error::$module/CHANGELOG.md has no '## $version' section"; exit 1 ;;
+            *unreleased*) echo "::error::$module/CHANGELOG.md still marks $version as unreleased"; exit 1 ;;
+          esac
+          # The section body, without the leading blank line
+          awk -v v="$version" '/^## / { if (found) exit; found = ($2 == v); next } found' "$module/CHANGELOG.md" \
+            | sed '/./,$!d' > notes.md
+
+          # Hangar projects can only be created on the website, so this is the one manual step
+          if ! curl -sf -o /dev/null "https://hangar.papermc.io/api/v1/projects/TuskWorks/$project"; then
+            echo "::error::Hangar project TuskWorks/$project doesn't exist yet; create it on hangar.papermc.io first"; exit 1
+          fi
+
+          {
+            echo "module=$module"
+            echo "project=$project"
+            echo "version=$version"
+            echo 'notes<<EOF_NOTES'
+            cat notes.md
+            echo 'EOF_NOTES'
+          } >> "$GITHUB_OUTPUT"
+
+  # The same build, unit tests, API check and e2e matrix as the plugin's own CI
+  test-tuskclans:
+    needs: meta
+    if: needs.meta.outputs.module == 'tuskclans'
+    uses: ./.github/workflows/tuskclans.yml
+  test-tuskcrates:
+    needs: meta
+    if: needs.meta.outputs.module == 'tuskcrates'
+    uses: ./.github/workflows/tuskcrates.yml
+  test-tuskorders:
+    needs: meta
+    if: needs.meta.outputs.module == 'tuskorders'
+    uses: ./.github/workflows/tuskorders.yml
+
+  publish:
+    needs: [meta, test-tuskclans, test-tuskcrates, test-tuskorders]
+    # The other two test jobs are skipped; the one that ran must have passed
+    if: >-
+      always() && needs.meta.result == 'success'
+      && (needs.test-tuskclans.result == 'success' || needs.test-tuskcrates.result == 'success' || needs.test-tuskorders.result == 'success')
+      && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      MODULE: ${{ needs.meta.outputs.module }}
+      PROJECT: ${{ needs.meta.outputs.project }}
+      VERSION: ${{ needs.meta.outputs.version }}
+      NOTES: ${{ needs.meta.outputs.notes }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v6
+      - run: printf '%s\n' "$NOTES" > release-notes.md
+
+      # Skipped when re-running a release whose Hangar upload already went through
+      - name: Publish to Hangar
+        env:
+          HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
+        run: |
+          if curl -sf -o /dev/null "https://hangar.papermc.io/api/v1/projects/TuskWorks/$PROJECT/versions/$VERSION"; then
+            echo "$PROJECT $VERSION is already on Hangar"
+          else
+            HANGAR_CHANGELOG="$NOTES" ./gradlew ":$MODULE:publishPluginPublicationToHangar"
+          fi
+
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            echo "Release $GITHUB_REF_NAME already exists"
+          else
+            ./gradlew ":$MODULE:jar"
+            gh release create "$GITHUB_REF_NAME" "$MODULE/build/libs/$PROJECT-$VERSION.jar" \
+              --verify-tag --title "$PROJECT $VERSION" --notes-file release-notes.md
+          fi

@@ -1,5 +1,6 @@
 plugins {
     java
+    id("io.papermc.hangar-publish-plugin")
 }
 
 group = "io.github.tuskworks"
@@ -61,4 +62,25 @@ tasks.jar {
     manifest.attributes("paperweight-mappings-namespace" to "mojang")
     // GPL-3.0: every copy of the jar carries the license text
     from(rootProject.file("LICENSE"))
+}
+
+// Uploaded by .github/workflows/release.yml when a tuskclans-v<version> tag is pushed
+hangarPublish {
+    publications.register("plugin") {
+        version = project.version as String
+        id = "TuskClans"
+        channel = "Release"
+        changelog = providers.environmentVariable("HANGAR_CHANGELOG")
+        apiKey = providers.environmentVariable("HANGAR_API_TOKEN")
+        platforms {
+            paper {
+                jar = tasks.jar.flatMap { it.archiveFile }
+                platformVersions = providers.gradleProperty("hangarPaperVersions").map { it.split(",") }
+                dependencies {
+                    hangar("PlaceholderAPI") { required = false }
+                    url("Vault", "https://www.spigotmc.org/resources/vault.34315/") { required = false }
+                }
+            }
+        }
+    }
 }
